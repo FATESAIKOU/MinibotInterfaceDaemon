@@ -91,9 +91,15 @@ namespace NEXCOMROBOT
             GroupControl aim_group = mRobot.Group[group_id];
 
             int status = 0;
+            int state = 0;
             do {
+                aim_group.GroupAdapter.NMC_GroupGetState(ref state);
                 aim_group.GroupAdapter.NMC_GroupGetStatus(ref status);
                 System.Threading.Thread.Sleep(interval);
+                
+                if (state == NexMotion_Define.GROUP_STATE_ERROR) {
+                    throw new System.ArgumentException("State Error!", "STATE");                    
+                }
             } while((status ^ status_mask) != 0);
         }
 
@@ -133,8 +139,9 @@ namespace NEXCOMROBOT
             return mRobot.Group[group_id].GroupAdapter.NMC_GroupStop();
         }
 
-        public int Home(GroupControl aim_group, int axis_index)
-        {
+        public int Home(int group_id, int axis_index)
+        {                
+            GroupControl aim_group = mRobot.Group[group_id];
             int param_num = 0x80;
             int sub_index = 0;
             int ret;
@@ -153,12 +160,15 @@ namespace NEXCOMROBOT
 
         public int HomeAll(int group_id)
         {
-            int ret = 0;
+            if (CheckParam(group_id, AvalibleStatus) == false)
+                return -1;
 
             GroupControl aim_group = mRobot.Group[group_id];
+            
+            int ret = 0;
             for (int axis_index = 0; axis_index < aim_group.AxisCount; ++ axis_index)
             {
-                ret = Home(aim_group, axis_index);
+                ret = Home(group_id, axis_index);
                 if (ret != NexMotion_ErrCode.NMCERR_SUCCESS) break;
             }
 
@@ -169,6 +179,9 @@ namespace NEXCOMROBOT
         public int AcsJog(int group_id, int axis_index, int direction, int interval,
             double max_vel /* ohn... no zero */)
         {
+            if (CheckParam(group_id, AvalibleStatus) == false)
+                return -1;
+
             GroupControl aim_group = mRobot.Group[group_id];
 
             int ret;
@@ -183,6 +196,9 @@ namespace NEXCOMROBOT
         public int PcsLine(int group_id, Pos_T dest,
             double max_vel /* ohn... it can be zero this time... */)
         {
+            if (CheckParam(group_id, AvalibleStatus) == false)
+                return -1;
+
             GroupControl aim_group = mRobot.Group[group_id];
             int mask = (1 << aim_group.AxisCount) - 1;
 
@@ -191,6 +207,9 @@ namespace NEXCOMROBOT
 
         public int AcsPTP(int group_id, Pos_T dest_acs)
         {
+            if (CheckParam(group_id, AvalibleStatus) == false)
+                return -1;
+
             GroupControl aim_group = mRobot.Group[group_id];
             int mask = (1 << aim_group.AxisCount) - 1;
 
@@ -199,6 +218,9 @@ namespace NEXCOMROBOT
 
         public int PcsPTP(int group_id, Pos_T dest)
         {
+            if (CheckParam(group_id, AvalibleStatus) == false)
+                return -1;
+
             GroupControl aim_group = mRobot.Group[group_id];
             int mask = (1 << aim_group.AxisCount) - 1;
 
@@ -236,6 +258,31 @@ namespace NEXCOMROBOT
             return NexMotion_ErrCode.NMCERR_SUCCESS;
         }
 
+        private bool CheckParam(int group_id, string[] valid_status)
+        {
+            int valid_status_code = 0;
+            int pos;
+            foreach (string s in valid_status)
+            {
+                pos = Array.IndexOf(StatusMap, s);
+
+                if (pos == -1) {
+                    throw new System.ArgumentException(
+                        String.Format("{0} is not an status in StatusMap", s),
+                        "STATUS");
+                } else {
+                    valid_status_code |= 1 << pos;
+                }
+            }
+
+            RobotParameters gp = mRobot.Group[group_id].GroupParameters;
+            if (gp.Status == valid_status_code) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         /* Decoder */
         private string[] StateMap = new string[] {
             "GROUP_DISABLE",
@@ -263,6 +310,11 @@ namespace NEXCOMROBOT
             "PCS_MAX_MOV",
             "GROUP_MOVING",
             "GROUP_STOPPED"
+        };
+
+        private string[] AvalibleStatus = new string[] {
+            "ALL_STAND_STILL",
+            "NO_POS_CHG",
         };
 
         private int[] HomingOpcodes = new int[] {
