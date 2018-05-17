@@ -97,10 +97,11 @@ namespace NEXCOMROBOT
                 aim_group.GroupAdapter.NMC_GroupGetStatus(ref status);
                 System.Threading.Thread.Sleep(interval);
                 
-                if (state == NexMotion_Define.GROUP_STATE_ERROR ||
-                    state == NexMotion_Define.GROUP_STATE_STOPPED) {
-                    throw new System.ArgumentException("State Error!", "STATE");                    
-                }
+                if (state == NexMotion_Define.GROUP_STATE_ERROR)
+                    throw new System.ArgumentException("State Error!", "STATE");
+
+                if (state == NexMotion_Define.GROUP_STATE_STOPPED)
+                    throw new System.ArgumentException("State Stoppedr!", "STATE");
 
             } while(status != aim_status);
         }
