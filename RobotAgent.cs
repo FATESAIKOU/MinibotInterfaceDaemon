@@ -116,6 +116,11 @@ namespace NEXCOMROBOT
             return mRobot.Group[group_id].GroupAdapter.NMC_GroupHalt();
         }
 
+        public int EMGStop(int group_id)
+        {
+            return mRobot.Group[group_id].GroupAdapter.NMC_GroupStop();
+        }
+
         public int Home(GroupControl aim_group, int axis_index)
         {
             int param_num = 0x80;
