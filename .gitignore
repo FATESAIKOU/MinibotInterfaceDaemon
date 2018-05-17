@@ -1,4 +1,6 @@
 NexMotionSDK
 SystemManager
+bin/
+obj/
 *.swp
 *.swo
