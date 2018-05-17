@@ -86,7 +86,7 @@ namespace NEXCOMROBOT
             return json_result;
         }
 
-        public void WaitStatus(int group_id, int status_mask, int interval)
+        public void WaitStatus(int group_id, int aim_status, int interval)
         {
             GroupControl aim_group = mRobot.Group[group_id];
 
@@ -97,10 +97,12 @@ namespace NEXCOMROBOT
                 aim_group.GroupAdapter.NMC_GroupGetStatus(ref status);
                 System.Threading.Thread.Sleep(interval);
                 
-                if (state == NexMotion_Define.GROUP_STATE_ERROR) {
+                if (state == NexMotion_Define.GROUP_STATE_ERROR ||
+                    state == NexMotion_Define.GROUP_STATE_STOPPED) {
                     throw new System.ArgumentException("State Error!", "STATE");                    
                 }
-            } while((status ^ status_mask) != 0);
+
+            } while(status != aim_status);
         }
 
         /* Param Setting */
@@ -175,7 +177,6 @@ namespace NEXCOMROBOT
             return ret;
         }
 
-        // Add Line, Circle, Jog for Acs/Pcs interface
         public int AcsJog(int group_id, int axis_index, int direction, int interval,
             double max_vel /* ohn... no zero */)
         {
@@ -193,6 +194,7 @@ namespace NEXCOMROBOT
             return ret;
         }
 
+        // No circle interface
         public int PcsLine(int group_id, Pos_T dest,
             double max_vel /* ohn... it can be zero this time... */)
         {
