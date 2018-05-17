@@ -63,10 +63,22 @@ namespace NEXCOMROBOT
             SysParamUpdate();
 
             var group_parameters = mRobot.Group[group_id].GroupParameters;
+            
+            string status_string = "";
+            bool hf = false;
+            for (int i = 0; i < 15; i ++) {
+                if ( (group_parameters.Status & (1 << i)) > 0 ) {
+                    status_string += '"' + StatusMap[i] + "\",";
+                    hf = true;
+                }
+            }
+            if (hf) {
+                status_string = status_string.Substring(0, status_string.Length - 1);
+            }
 
             string json_result = "{";
-            json_result += "\"State\":" + group_parameters.State.ToString() + ",\n";
-            json_result += "\"Status\":" + group_parameters.Status.ToString() + ",\n";
+            json_result += "\"State\": \"" + StateMap[group_parameters.State] + "\",\n";
+            json_result += "\"Status\": [" + status_string + "],\n";            
             json_result += "\"Acs\": [" + string.Join(",", group_parameters.ActAcs) + "],\n";
             json_result += "\"Pcs\": [" + string.Join(",", group_parameters.ActPcs) + "]\n";
             json_result += "}";
@@ -233,6 +245,24 @@ namespace NEXCOMROBOT
             "GROUP_MOVING",
             "GROUP_HOMING",
             "GROUP_ERROR_STOP"
+        };
+
+        private string[] StatusMap = new string[] {
+            "OUTER_EMGSTOP",
+            "DRIVER_ALARM",
+            "HW_PLIM_EXCEED",
+            "HW_NLIM_EXCEED",
+            "SW_PLIM_EXCEED",
+            "SW_NLIM_EXCEED",
+            "ALL_STAND_STILL",
+            "GROUP_ERR_STOP",
+            "",
+            "NO_POS_CHG",
+            "PCS_ACC_MOV",
+            "PCS_DCC_MOV",
+            "PCS_MAX_MOV",
+            "GROUP_MOVING",
+            "GROUP_STOPPED"
         };
 
         private int[] HomingOpcodes = new int[] {
