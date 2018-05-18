@@ -89,7 +89,7 @@ namespace NEXCOMROBOT
         public void WaitStatus(int group_id, int aim_status, int interval)
         {
             GroupControl aim_group = mRobot.Group[group_id];
-
+            
             int status = 0;
             int state = 0;
             do {
@@ -141,7 +141,7 @@ namespace NEXCOMROBOT
         {
             return mRobot.Group[group_id].GroupAdapter.NMC_GroupStop();
         }
-
+        
         public int Home(int group_id, int axis_index)
         {                
             GroupControl aim_group = mRobot.Group[group_id];

@@ -18,6 +18,7 @@ namespace NEXCOMROBOT
             Console.WriteLine("Hello World!");
             
             RobotAgent test_agent = new RobotAgent();
+            
             // test_agent.SetMode(NexMotion_Define.DEV_TYPE_ETHERCAT);
             test_agent.Init();
             Console.WriteLine(test_agent.GetGroupStatus(0));
