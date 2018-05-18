@@ -8,61 +8,40 @@ using System.Text;
 using System.Threading.Tasks;
 using NEXCOMROBOT.MCAT;
 
-//namespace work
 namespace NEXCOMROBOT
 {
     class RobotAgent
     {
-        private SystemControl mRobot = new SystemControl();
-        private int OperatingMode = NexMotion_Define.DEV_TYPE_SIMULATION;
+        private GroupControl group_ctrl;
+
+        public RobotAgent(GroupControl group_ctrl)
+        {
+            this.group_ctrl = group_ctrl;
+        }
 
         /* State Setting */
-        public void Init()
+        public void Enable()
         {
-            mRobot.InitDevice(OperatingMode);
-
-            foreach (GroupControl g in mRobot.Group)
-            {
-                if (g.GroupAdapter == null || g.GroupParameters == null)
-                {
-                    Console.WriteLine("Null Group Detected!");
-                }
-            }
-            SysParamUpdate();
+            group_ctrl.GroupAdapter.NMC_GroupEnable();
         }
 
-        public void Shutdown()
+        public void Disable()
         {
-            mRobot.DeviceAdapter.NMC_DeviceShutdown();
+            group_ctrl.GroupAdapter.NMC_GroupDisable();
         }
 
-        public void SetMode(int type)
+        public void Reset()
         {
-            this.OperatingMode = type;
-        }
-
-        public void EnableGroup(int group_id)
-        {
-            mRobot.Group[group_id].GroupAdapter.NMC_GroupEnable();
-        }
-
-        public void DisableGroup(int group_id)
-        {
-            mRobot.Group[group_id].GroupAdapter.NMC_GroupDisable();
-        }
-
-        public void ResetGroup(int group_id)
-        {
-            mRobot.Group[group_id].GroupAdapter.NMC_GroupDisable();
-            mRobot.Group[group_id].GroupAdapter.NMC_GroupResetState();
+            group_ctrl.GroupAdapter.NMC_GroupDisable();
+            group_ctrl.GroupAdapter.NMC_GroupResetState();
         }
         
         /* State Getting */
-        public string GetGroupStatus(int group_id)
+        public string GetStatus()
         {
             SysParamUpdate();
 
-            var group_parameters = mRobot.Group[group_id].GroupParameters;
+            var group_parameters = group_ctrl.GroupParameters;
             
             string status_string = "";
             bool hf = false;
@@ -86,15 +65,13 @@ namespace NEXCOMROBOT
             return json_result;
         }
 
-        public void WaitStatus(int group_id, int aim_status, int interval)
-        {
-            GroupControl aim_group = mRobot.Group[group_id];
-            
+        public void WaitStatus(int aim_status, int interval)
+        {            
             int status = 0;
             int state = 0;
             do {
-                aim_group.GroupAdapter.NMC_GroupGetState(ref state);
-                aim_group.GroupAdapter.NMC_GroupGetStatus(ref status);
+                group_ctrl.GroupAdapter.NMC_GroupGetState(ref state);
+                group_ctrl.GroupAdapter.NMC_GroupGetStatus(ref status);
                 System.Threading.Thread.Sleep(interval);
                 
                 if (state == NexMotion_Define.GROUP_STATE_ERROR)
@@ -107,23 +84,22 @@ namespace NEXCOMROBOT
         }
 
         /* Param Setting */
-        public void SetHomePos(int group_id, Pos_T home_pos)
+        public void SetHomePos(Pos_T home_pos)
         {
-            int mask = 1 << mRobot.Group[group_id].AxisCount - 1;
+            int mask = 1 << group_ctrl.AxisCount - 1;
 
-            mRobot.Group[group_id].GroupAdapter.NMC_GroupSetHomePos(mask, ref home_pos);
+            group_ctrl.GroupAdapter.NMC_GroupSetHomePos(mask, ref home_pos);
             SysParamUpdate();
         }
 
-        public void SetVelocity(int group_id, double[] vel)
+        public void SetVelocity(double[] vel)
         {
             int param_num = 0x32;
             int sub_index = 0;
 
-            GroupControl aim_group = mRobot.Group[group_id];
-            for (int axis_index = 0; axis_index < aim_group.AxisCount; ++ axis_index)
+            for (int axis_index = 0; axis_index < group_ctrl.AxisCount; ++ axis_index)
             {
-                aim_group.GroupAdapter.NMC_GroupAxSetParamF64(
+                group_ctrl.GroupAdapter.NMC_GroupAxSetParamF64(
                     axis_index, param_num, sub_index,
                     vel[axis_index]
                 );
@@ -132,136 +108,117 @@ namespace NEXCOMROBOT
         }
         
         /* Moving */
-        public int Halt(int group_id)
+        public int Halt()
         {
-            return mRobot.Group[group_id].GroupAdapter.NMC_GroupHalt();
+            return group_ctrl.GroupAdapter.NMC_GroupHalt();
         }
 
-        public int EMGStop(int group_id)
+        public int EMGStop()
         {
-            return mRobot.Group[group_id].GroupAdapter.NMC_GroupStop();
+            return group_ctrl.GroupAdapter.NMC_GroupStop();
         }
         
-        public int Home(int group_id, int axis_index)
-        {                
-            GroupControl aim_group = mRobot.Group[group_id];
+        public int Home(int axis_index)
+        {
             int param_num = 0x80;
             int sub_index = 0;
             int ret;
 
-            ret = aim_group.GroupAdapter.NMC_GroupAxSetParamI32(
+            ret = group_ctrl.GroupAdapter.NMC_GroupAxSetParamI32(
                 axis_index, param_num, sub_index,
                 HomingOpcodes[Math.Min(axis_index, 6)]
             );
 
             if (ret != NexMotion_ErrCode.NMCERR_SUCCESS) return ret;
 
-            ret = aim_group.GroupAdapter.NMC_GroupAxesHomeDrive(1 << axis_index);
+            ret = group_ctrl.GroupAdapter.NMC_GroupAxesHomeDrive(1 << axis_index);
 
             return ret;
         }
 
-        public int HomeAll(int group_id)
+        public int HomeAll()
         {
-            if (CheckParam(group_id, AvalibleStatus) == false)
+            if (CheckParam(AvalibleStatus) == false)
                 return -1;
-
-            GroupControl aim_group = mRobot.Group[group_id];
             
             int ret = 0;
-            for (int axis_index = 0; axis_index < aim_group.AxisCount; ++ axis_index)
+            for (int axis_index = 0; axis_index < group_ctrl.AxisCount; ++ axis_index)
             {
-                ret = Home(group_id, axis_index);
+                ret = Home(axis_index);
                 if (ret != NexMotion_ErrCode.NMCERR_SUCCESS) break;
             }
 
             return ret;
         }
 
-        public int AcsJog(int group_id, int axis_index, int direction, int interval,
+        public int AcsJog(int axis_index, int direction, int interval,
             double max_vel /* ohn... no zero */)
         {
-            if (CheckParam(group_id, AvalibleStatus) == false)
+            if (CheckParam(AvalibleStatus) == false)
                 return -1;
 
-            GroupControl aim_group = mRobot.Group[group_id];
-
             int ret;
-            ret = aim_group.GroupAdapter.NMC_GroupJogAcs(axis_index, direction, ref max_vel);
+            ret = group_ctrl.GroupAdapter.NMC_GroupJogAcs(axis_index, direction, ref max_vel);
             if (ret != NexMotion_ErrCode.NMCERR_SUCCESS) return ret;
 
             System.Threading.Thread.Sleep(interval);
-            ret = aim_group.GroupAdapter.NMC_GroupHalt();
+            ret = group_ctrl.GroupAdapter.NMC_GroupHalt();
             return ret;
         }
 
         // No circle interface
-        public int PcsLine(int group_id, Pos_T dest,
+        public int PcsLine(Pos_T dest,
             double max_vel /* ohn... it can be zero this time... */)
         {
-            if (CheckParam(group_id, AvalibleStatus) == false)
+            if (CheckParam(AvalibleStatus) == false)
                 return -1;
 
-            GroupControl aim_group = mRobot.Group[group_id];
-            int mask = (1 << aim_group.AxisCount) - 1;
+            int mask = (1 << group_ctrl.AxisCount) - 1;
 
-            return aim_group.GroupAdapter.NMC_GroupLine(mask, ref dest, ref max_vel);
+            return group_ctrl.GroupAdapter.NMC_GroupLine(mask, ref dest, ref max_vel);
         }
 
-        public int AcsPTP(int group_id, Pos_T dest_acs)
+        public int AcsPTP(Pos_T dest_acs)
         {
-            if (CheckParam(group_id, AvalibleStatus) == false)
+            if (CheckParam(AvalibleStatus) == false)
                 return -1;
 
-            GroupControl aim_group = mRobot.Group[group_id];
-            int mask = (1 << aim_group.AxisCount) - 1;
+            int mask = (1 << group_ctrl.AxisCount) - 1;
 
-            return aim_group.GroupAdapter.NMC_GroupPtpAcsAll(mask, ref dest_acs);
+            return group_ctrl.GroupAdapter.NMC_GroupPtpAcsAll(mask, ref dest_acs);
         }
 
-        public int PcsPTP(int group_id, Pos_T dest)
+        public int PcsPTP(Pos_T dest)
         {
-            if (CheckParam(group_id, AvalibleStatus) == false)
+            if (CheckParam(AvalibleStatus) == false)
                 return -1;
 
-            GroupControl aim_group = mRobot.Group[group_id];
-            int mask = (1 << aim_group.AxisCount) - 1;
+            int mask = (1 << group_ctrl.AxisCount) - 1;
 
-            return aim_group.GroupAdapter.NMC_GroupPtpCartAll(mask, ref dest);
+            return group_ctrl.GroupAdapter.NMC_GroupPtpCartAll(mask, ref dest);
         }
 
         /* Other Utils */
-        private int SysParamUpdate()
+        public int SysParamUpdate()
         {
-            NexMotion_GroupAdapter groupAdapter;
-            RobotParameters groupParameters;
+            NexMotion_GroupAdapter groupAdapter = group_ctrl.GroupAdapter;
+            RobotParameters groupParameters     = group_ctrl.GroupParameters;
 
-            int axisCount;
+            groupAdapter.NMC_GroupGetState(ref groupParameters.State);
+            groupAdapter.NMC_GroupGetStatus(ref groupParameters.Status);
+            groupAdapter.NMC_GroupGetActualPosAcs(ref groupParameters.PosAcs);
+            groupAdapter.NMC_GroupGetActualPosPcs(ref groupParameters.PosPcs);
 
-            #region Group
-            foreach (GroupControl g in mRobot.Group)
-            {
-                groupAdapter    = g.GroupAdapter;
-                groupParameters = g.GroupParameters;
-                axisCount       = g.AxisCount;
-
-                groupAdapter.NMC_GroupGetState(ref groupParameters.State);
-                groupAdapter.NMC_GroupGetStatus(ref groupParameters.Status);
-                groupAdapter.NMC_GroupGetActualPosAcs(ref groupParameters.PosAcs);
-                groupAdapter.NMC_GroupGetActualPosPcs(ref groupParameters.PosPcs);
-
-                // WTF...
-                groupParameters.ActAcs = groupParameters.PosAcs.pos;
-                groupParameters.ActPcs = groupParameters.PosPcs.pos;
-            }
-            #endregion
+            // WTF...
+            groupParameters.ActAcs = groupParameters.PosAcs.pos;
+            groupParameters.ActPcs = groupParameters.PosPcs.pos;
             
             /* TODO: IO Sync? */
 
             return NexMotion_ErrCode.NMCERR_SUCCESS;
         }
 
-        private bool CheckParam(int group_id, string[] valid_status)
+        private bool CheckParam(string[] valid_status)
         {
             int valid_status_code = 0;
             int pos;
@@ -278,7 +235,7 @@ namespace NEXCOMROBOT
                 }
             }
 
-            RobotParameters gp = mRobot.Group[group_id].GroupParameters;
+            RobotParameters gp = group_ctrl.GroupParameters;
             if (gp.Status == valid_status_code) {
                 return true;
             } else {
