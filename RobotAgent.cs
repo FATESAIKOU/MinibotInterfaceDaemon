@@ -272,7 +272,7 @@ namespace NEXCOMROBOT
             "GROUP_STOPPED"
         };
 
-        private string[] AvalibleStatus = new string[] {
+        public string[] AvalibleStatus { get; set; } = new string[] {
             "ALL_STAND_STILL",
             "NO_POS_CHG",
         };

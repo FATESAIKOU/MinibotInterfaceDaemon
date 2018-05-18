@@ -20,7 +20,7 @@ namespace NEXCOMROBOT
             EtherCAT ether_cat_net = new EtherCAT();
             //ether_cat_net.SetMode(NexMotion_Define.DEV_TYPE_ETHERCAT);
 
-            ether_cat_net.InitRobot();            
+            ether_cat_net.InitRobot();
             Console.WriteLine(ether_cat_net.GetRobotAgent(0).GetStatus());
             ether_cat_net.GetRobotAgent(0).Enable();
             Console.WriteLine(ether_cat_net.GetRobotAgent(0).GetStatus());

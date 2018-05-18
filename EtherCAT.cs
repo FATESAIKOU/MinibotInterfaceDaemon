@@ -12,7 +12,7 @@ namespace NEXCOMROBOT
 {
     class EtherCAT
     {
-        public List<RobotAgent> robots;
+        private List<RobotAgent> robots;
         private SystemControl mRobot = new SystemControl();
         private int OperatingMode = NexMotion_Define.DEV_TYPE_SIMULATION;
 
