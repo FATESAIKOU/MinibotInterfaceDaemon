@@ -43,6 +43,26 @@ namespace NEXCOMROBOT
             }
         }
 
+        public void InitIOForRobot(uint offset, int group_id)
+        {
+            if (robots.Count < 1)
+            {
+                Console.WriteLine("No such group to be assign to!");
+                return;
+            }
+            
+            if (offset > SystemConfig.NEXCOMROBOT_MAX_IO)
+            {
+                Console.WriteLine("Exceed pre-defined io range!");
+                return;
+            }
+
+            NexMotion_IOAdapter tmp_IOAdapter = new NexMotion_IOAdapter(mRobot.DeviceID);
+            GripperController tmp_gripper_ctl = new GripperController(tmp_IOAdapter, offset, offset);
+
+            robots[group_id].SetGripper(tmp_gripper_ctl);
+        }
+
         public void Shutdown()
         {
             mRobot.DeviceAdapter.NMC_DeviceShutdown();

@@ -51,35 +51,61 @@ namespace NEXCOMROBOT
         private NexMotionDataValue mtempValue = new NexMotionDataValue();
 
         #region TxPDO OFFSET
-        const int INPUT_DATA_OFFSET = 2;
-        const int CONTROLLER_FLAG_OFFSET = INPUT_DATA_OFFSET + 2;
-        const int CURRENT_POSITION_OFFSET = INPUT_DATA_OFFSET + 4;
-        const int CURRENT_SPEED_OFFSET = INPUT_DATA_OFFSET + 8;
-        const int CURRENT_PUSHGIN_FORCE_OFFSET = INPUT_DATA_OFFSET + 10;
-        const int SET_TARGET_POSITION_OFFSET = INPUT_DATA_OFFSET + 12;
-        const int ALARM1_OFFSET = INPUT_DATA_OFFSET + 16;
+        private uint INPUT_DATA_OFFSET;
+        private uint CONTROLLER_FLAG_OFFSET;
+        private uint CURRENT_POSITION_OFFSET;
+        private uint CURRENT_SPEED_OFFSET;
+        private uint CURRENT_PUSHGIN_FORCE_OFFSET;
+        private uint SET_TARGET_POSITION_OFFSET;
+        private uint ALARM1_OFFSET;
         #endregion
 
         #region RxPDO OFFSET
-        const int OUTPUT_DATA_OFFSET = 2;
-        const int DATA_FLAG_OFFSET = OUTPUT_DATA_OFFSET + 2;
-        const int START_FLAG_OFFSET = OUTPUT_DATA_OFFSET + 4;
-        const int MOVEMENT_MODE_OFFSET = OUTPUT_DATA_OFFSET + 5;
-        const int SPEED_OFFSET = OUTPUT_DATA_OFFSET + 6;
-        const int TARGET_POSITION_OFFSET = OUTPUT_DATA_OFFSET + 8;
-        const int ACC_OFFSET = OUTPUT_DATA_OFFSET + 12;
-        const int DEC_OFFSET = OUTPUT_DATA_OFFSET + 14;
-        const int PUSHING_FORCE_OFFSET = OUTPUT_DATA_OFFSET + 16;
-        const int TRIGGER_LV_OFFSET = OUTPUT_DATA_OFFSET + 18;
-        const int PUSHING_SPEED_OFFSET = OUTPUT_DATA_OFFSET + 20;
-        const int MOVEING_FORCE_OFFSET = OUTPUT_DATA_OFFSET + 22;
-        const int AREA1_OFFSET = OUTPUT_DATA_OFFSET + 24;
-        const int AREA2_OFFSET = OUTPUT_DATA_OFFSET + 28;
-        const int IN_POSINTION_OFFSET = OUTPUT_DATA_OFFSET + 32;
+        private uint OUTPUT_DATA_OFFSET;
+        private uint DATA_FLAG_OFFSET;
+        private uint START_FLAG_OFFSET;
+        private uint MOVEMENT_MODE_OFFSET;
+        private uint SPEED_OFFSET;
+        private uint TARGET_POSITION_OFFSET;
+        private uint ACC_OFFSET;
+        private uint DEC_OFFSET;
+        private uint PUSHING_FORCE_OFFSET;
+        private uint TRIGGER_LV_OFFSET;
+        private uint PUSHING_SPEED_OFFSET;
+        private uint MOVEING_FORCE_OFFSET;
+        private uint AREA1_OFFSET;
+        private uint AREA2_OFFSET;
+        private uint IN_POSINTION_OFFSET;
         #endregion
 
-        public GripperController(NexMotion_IOAdapter ioadapter)
+        public GripperController(NexMotion_IOAdapter ioadapter, uint tx_offset, uint rx_offset)
         {
+            /* TxPDO OFFSET */
+            INPUT_DATA_OFFSET = tx_offset;
+            CONTROLLER_FLAG_OFFSET = INPUT_DATA_OFFSET + 2;
+            CURRENT_POSITION_OFFSET = INPUT_DATA_OFFSET + 4;
+            CURRENT_SPEED_OFFSET = INPUT_DATA_OFFSET + 8;
+            CURRENT_PUSHGIN_FORCE_OFFSET = INPUT_DATA_OFFSET + 10;
+            SET_TARGET_POSITION_OFFSET = INPUT_DATA_OFFSET + 12;
+            ALARM1_OFFSET = INPUT_DATA_OFFSET + 16;
+
+            /* RxPDO OFFSET */
+            OUTPUT_DATA_OFFSET = rx_offset;
+            DATA_FLAG_OFFSET = OUTPUT_DATA_OFFSET + 2;
+            START_FLAG_OFFSET = OUTPUT_DATA_OFFSET + 4;
+            MOVEMENT_MODE_OFFSET = OUTPUT_DATA_OFFSET + 5;
+            SPEED_OFFSET = OUTPUT_DATA_OFFSET + 6;
+            TARGET_POSITION_OFFSET = OUTPUT_DATA_OFFSET + 8;
+            ACC_OFFSET = OUTPUT_DATA_OFFSET + 12;
+            DEC_OFFSET = OUTPUT_DATA_OFFSET + 14;
+            PUSHING_FORCE_OFFSET = OUTPUT_DATA_OFFSET + 16;
+            TRIGGER_LV_OFFSET = OUTPUT_DATA_OFFSET + 18;
+            PUSHING_SPEED_OFFSET = OUTPUT_DATA_OFFSET + 20;
+            MOVEING_FORCE_OFFSET = OUTPUT_DATA_OFFSET + 22;
+            AREA1_OFFSET = OUTPUT_DATA_OFFSET + 24;
+            AREA2_OFFSET = OUTPUT_DATA_OFFSET + 28;
+            IN_POSINTION_OFFSET = OUTPUT_DATA_OFFSET + 32;
+
             mIoAdapter = ioadapter;
         }
 

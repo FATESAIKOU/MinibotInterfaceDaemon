@@ -20,6 +20,11 @@ namespace NEXCOMROBOT
             this.group_ctrl = group_ctrl;
         }
 
+        public void SetGripper(GripperController gripper_ctl)
+        {
+            this.gripper_ctl = gripper_ctl;
+        }
+
         /* State Setting */
         public void Enable()
         {
