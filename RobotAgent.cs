@@ -1,11 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NEXCOMROBOT.MCAT;
 
 namespace NEXCOMROBOT
@@ -13,7 +6,7 @@ namespace NEXCOMROBOT
     class RobotAgent
     {
         private GroupControl group_ctrl;
-        private GripperController gripper_ctl;
+        public GripperController gripper_ctl;
 
         public RobotAgent(GroupControl group_ctrl)
         {
@@ -26,23 +19,29 @@ namespace NEXCOMROBOT
         }
 
         /* State Setting */
+        #region StateSetting
         public void Enable()
         {
             group_ctrl.GroupAdapter.NMC_GroupEnable();
+            gripper_ctl.SVON = true;
         }
 
         public void Disable()
         {
             group_ctrl.GroupAdapter.NMC_GroupDisable();
+            gripper_ctl.SVON = false;
         }
 
         public void Reset()
         {
             group_ctrl.GroupAdapter.NMC_GroupDisable();
             group_ctrl.GroupAdapter.NMC_GroupResetState();
+            gripper_ctl.RESET = true;
         }
+        #endregion
         
         /* State Getting */
+        #region StateGetting
         public string GetStatus()
         {
             SysParamUpdate();
@@ -66,30 +65,45 @@ namespace NEXCOMROBOT
             json_result += "\"Status\": [" + status_string + "],\n";            
             json_result += "\"Acs\": [" + string.Join(",", group_parameters.ActAcs) + "],\n";
             json_result += "\"Pcs\": [" + string.Join(",", group_parameters.ActPcs) + "]\n";
+            json_result += "\"GripperAlarm\":" + gripper_ctl.Alarme_1.ToString() + "\n";
             json_result += "}";
 
             return json_result;
         }
+        #endregion
 
-        public void WaitStatus(int aim_status, int interval)
-        {            
-            int status = 0;
-            int state = 0;
-            do {
-                group_ctrl.GroupAdapter.NMC_GroupGetState(ref state);
-                group_ctrl.GroupAdapter.NMC_GroupGetStatus(ref status);
-                System.Threading.Thread.Sleep(interval);
-                
-                if (state == NexMotion_Define.GROUP_STATE_ERROR)
-                    throw new System.ArgumentException("State Error!", "STATE");
-
-                if (state == NexMotion_Define.GROUP_STATE_STOPPED)
-                    throw new System.ArgumentException("State Stoppedr!", "STATE");
-
-            } while(status != aim_status);
+        /* All Moving */
+        #region AllMoving
+        public int Halt()
+        {
+            return group_ctrl.GroupAdapter.NMC_GroupHalt();
         }
 
-        /* Param Setting */
+        public int EMGStop()
+        {
+            return group_ctrl.GroupAdapter.NMC_GroupStop();
+        }
+
+        public int HomeAll()
+        {
+            if (CheckParam(AvalibleStatus) == false)
+                return -1;
+            
+            int ret = 0;
+            for (int axis_index = 0; axis_index < group_ctrl.AxisCount; ++ axis_index)
+            {
+                ret = HomeRobot(axis_index);
+                if (ret != NexMotion_ErrCode.NMCERR_SUCCESS) break;
+            }
+
+            HomeGripper();
+
+            return ret;
+        }
+        #endregion
+
+        /* Robot Param Setting */
+        #region RobotParamSetting
         public void SetHomePos(Pos_T home_pos)
         {
             int mask = 1 << group_ctrl.AxisCount - 1;
@@ -112,19 +126,11 @@ namespace NEXCOMROBOT
             }
             SysParamUpdate();
         }
+        #endregion
         
-        /* Moving */
-        public int Halt()
-        {
-            return group_ctrl.GroupAdapter.NMC_GroupHalt();
-        }
-
-        public int EMGStop()
-        {
-            return group_ctrl.GroupAdapter.NMC_GroupStop();
-        }
-        
-        public int Home(int axis_index)
+        /* Robot Moving */
+        #region RobotMoving
+        public int HomeRobot(int axis_index)
         {
             int param_num = 0x80;
             int sub_index = 0;
@@ -138,21 +144,6 @@ namespace NEXCOMROBOT
             if (ret != NexMotion_ErrCode.NMCERR_SUCCESS) return ret;
 
             ret = group_ctrl.GroupAdapter.NMC_GroupAxesHomeDrive(1 << axis_index);
-
-            return ret;
-        }
-
-        public int HomeAll()
-        {
-            if (CheckParam(AvalibleStatus) == false)
-                return -1;
-            
-            int ret = 0;
-            for (int axis_index = 0; axis_index < group_ctrl.AxisCount; ++ axis_index)
-            {
-                ret = Home(axis_index);
-                if (ret != NexMotion_ErrCode.NMCERR_SUCCESS) break;
-            }
 
             return ret;
         }
@@ -203,8 +194,18 @@ namespace NEXCOMROBOT
 
             return group_ctrl.GroupAdapter.NMC_GroupPtpCartAll(mask, ref dest);
         }
+        #endregion
+
+        /* Gripper Moving */
+        #region GripperMoving
+        public void HomeGripper()
+        {
+            gripper_ctl.SETUP = true;
+        }
+        #endregion
 
         /* Other Utils */
+        #region Utils
         public int SysParamUpdate()
         {
             NexMotion_GroupAdapter groupAdapter = group_ctrl.GroupAdapter;
@@ -248,6 +249,25 @@ namespace NEXCOMROBOT
                 return false;
             }
         }
+
+        public void WaitStatus(int aim_status, int interval)
+        {            
+            int status = 0;
+            int state = 0;
+            do {
+                group_ctrl.GroupAdapter.NMC_GroupGetState(ref state);
+                group_ctrl.GroupAdapter.NMC_GroupGetStatus(ref status);
+                System.Threading.Thread.Sleep(interval);
+                
+                if (state == NexMotion_Define.GROUP_STATE_ERROR)
+                    throw new System.ArgumentException("State Error!", "STATE");
+
+                if (state == NexMotion_Define.GROUP_STATE_STOPPED)
+                    throw new System.ArgumentException("State Stoppedr!", "STATE");
+
+            } while(status != aim_status);
+        }
+        #endregion
 
         /* Decoder */
         private string[] StateMap = new string[] {

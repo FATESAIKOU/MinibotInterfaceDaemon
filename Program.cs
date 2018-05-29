@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NEXCOMROBOT.MCAT;
 
 //namespace work
@@ -22,15 +15,25 @@ namespace NEXCOMROBOT
 
             ether_cat_net.InitRobot();
             ether_cat_net.InitIOForRobot(2, 0);
+            StateTest(ether_cat_net);
+            MotionTest(ether_cat_net);
+            ether_cat_net.Shutdown();        
+        }
+
+
+        static void StateTest(EtherCAT ether_cat_net)
+        {
             Console.WriteLine(ether_cat_net.GetRobotAgent(0).GetStatus());
             ether_cat_net.GetRobotAgent(0).Enable();
             Console.WriteLine(ether_cat_net.GetRobotAgent(0).GetStatus());
             ether_cat_net.GetRobotAgent(0).Disable();
             Console.WriteLine(ether_cat_net.GetRobotAgent(0).GetStatus());
             ether_cat_net.GetRobotAgent(0).Reset();
-            Console.WriteLine(ether_cat_net.GetRobotAgent(0).GetStatus());
+            Console.WriteLine(ether_cat_net.GetRobotAgent(0).GetStatus());            
+        }
 
-            // Motion test
+        static void MotionTest(EtherCAT ether_cat_net)
+        {
             ether_cat_net.GetRobotAgent(0).Enable();
             ether_cat_net.GetRobotAgent(0).WaitStatus(576, 100);
 
@@ -76,8 +79,24 @@ namespace NEXCOMROBOT
             ether_cat_net.GetRobotAgent(0).WaitStatus(576, 100);
             Console.WriteLine("End PcsPTP!");
             Console.WriteLine(ether_cat_net.GetRobotAgent(0).GetStatus());
+        }
 
-            ether_cat_net.Shutdown();        
+        static void GripperTest(EtherCAT ether_cat_net)
+        {
+            ether_cat_net.GetRobotAgent(0).Enable();
+            ether_cat_net.GetRobotAgent(0).HomeGripper();
+
+            while (true)
+            {
+                Console.WriteLine(ether_cat_net.GetRobotAgent(0).GetStatus());
+                System.Threading.Thread.Sleep(1000);
+
+                if (ether_cat_net.GetRobotAgent(0).gripper_ctl.Alarme_1 != 0)
+                {
+                    ether_cat_net.GetRobotAgent(0).Reset();
+                    ether_cat_net.GetRobotAgent(0).Enable();
+                }
+            }
         }
     }
 }
