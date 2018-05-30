@@ -23,20 +23,21 @@ namespace NEXCOMROBOT
         public void Enable()
         {
             group_ctrl.GroupAdapter.NMC_GroupEnable();
-            gripper_ctl.SVON = true;
+            EnableGripper();
         }
 
         public void Disable()
         {
             group_ctrl.GroupAdapter.NMC_GroupDisable();
-            gripper_ctl.SVON = false;
+            DisableGripper();
         }
 
         public void Reset()
         {
             group_ctrl.GroupAdapter.NMC_GroupDisable();
             group_ctrl.GroupAdapter.NMC_GroupResetState();
-            gripper_ctl.RESET = true;
+            DisableGripper();
+            ResetGripper();
         }
         #endregion
         
@@ -196,11 +197,71 @@ namespace NEXCOMROBOT
         }
         #endregion
 
+        /* Gripper State Setting */
+        #region GripperStateSetting
+        public void EnableGripper()
+        {
+            gripper_ctl.SVON = true;
+
+            do {
+                System.Threading.Thread.Sleep(gripper_check_interval);
+            } while (!gripper_ctl.SVRE);
+        }
+
+        public void DisableGripper()
+        {
+            gripper_ctl.SVON = false;
+
+            do {
+                System.Threading.Thread.Sleep(gripper_check_interval);
+            } while (gripper_ctl.SVON);
+        }
+
+        public void ResetGripper()
+        {
+            gripper_ctl.RESET = true;
+
+            do {
+                System.Threading.Thread.Sleep(gripper_check_interval);
+            } while (gripper_ctl.ALARM);
+
+            gripper_ctl.RESET = false;
+        }
+        #endregion
+
+        /* Gripper State Getting */
+        #region GripperStateGetting
+        public string GetGripperStatus()
+        {
+            bool   is_gripped = gripper_ctl.INP;
+            double current_pos = gripper_ctl.Current_Position / 100.0;
+            int    alarm_code = gripper_ctl.Alarme_1;
+            bool   is_ready = gripper_ctl.Ready;
+            bool   is_busy = gripper_ctl.BUSY;
+
+            string status_string = "{\n";
+            status_string += "\"IsGripped\": " + is_gripped.ToString() + ",\n";
+            status_string += "\"CurrentPos\": " + current_pos.ToString() + ",\n";
+            status_string += "\"AlarmCode\": " + alarm_code.ToString() + ",\n";
+            status_string += "\"IsReady\": " + is_ready.ToString() + ",\n";
+            status_string += "\"IsBusy\": " + is_busy.ToString() + ",\n";
+            status_string += "}\n";
+
+            return status_string;
+        }
+        #endregion
+
         /* Gripper Moving */
         #region GripperMoving
         public void HomeGripper()
         {
             gripper_ctl.SETUP = true;
+
+            do {
+                System.Threading.Thread.Sleep(gripper_check_interval);
+            } while (gripper_ctl.BUSY);
+
+            gripper_ctl.SETUP = false;
         }
         #endregion
 
@@ -307,5 +368,7 @@ namespace NEXCOMROBOT
             20, 20, 22, 20, 22, 20,
             35 // Default is 35
         };
+
+        private int gripper_check_interval = 100;
     }
 }

@@ -15,8 +15,11 @@ namespace NEXCOMROBOT
 
             ether_cat_net.InitRobot();
             ether_cat_net.InitIOForRobot(2, 0);
+            /*
             StateTest(ether_cat_net);
             MotionTest(ether_cat_net);
+            */
+            GripperTest(ether_cat_net);
             ether_cat_net.Shutdown();        
         }
 
@@ -84,19 +87,16 @@ namespace NEXCOMROBOT
         static void GripperTest(EtherCAT ether_cat_net)
         {
             ether_cat_net.GetRobotAgent(0).Enable();
+            Console.WriteLine("\n[Enable]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
+            ether_cat_net.GetRobotAgent(0).Disable();
+            Console.WriteLine("\n[Disable]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
+            ether_cat_net.GetRobotAgent(0).Reset();
+            Console.WriteLine("\n[Reset]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
+
+            ether_cat_net.GetRobotAgent(0).Enable();
+            Console.WriteLine("\n[Enable]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
             ether_cat_net.GetRobotAgent(0).HomeGripper();
-
-            while (true)
-            {
-                Console.WriteLine(ether_cat_net.GetRobotAgent(0).GetStatus());
-                System.Threading.Thread.Sleep(1000);
-
-                if (ether_cat_net.GetRobotAgent(0).gripper_ctl.Alarme_1 != 0)
-                {
-                    ether_cat_net.GetRobotAgent(0).Reset();
-                    ether_cat_net.GetRobotAgent(0).Enable();
-                }
-            }
+            Console.WriteLine("\n[Home]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
         }
     }
 }
