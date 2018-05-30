@@ -66,7 +66,7 @@ namespace NEXCOMROBOT
             json_result += "\"Status\": [" + status_string + "],\n";            
             json_result += "\"Acs\": [" + string.Join(",", group_parameters.ActAcs) + "],\n";
             json_result += "\"Pcs\": [" + string.Join(",", group_parameters.ActPcs) + "]\n";
-            json_result += "\"GripperAlarm\":" + gripper_ctl.Alarme_1.ToString() + "\n";
+            json_result += "\"Gripper\":" + GetGripperStatus() + "\n";
             json_result += "}";
 
             return json_result;
