@@ -257,9 +257,8 @@ namespace NEXCOMROBOT
         {
             gripper_ctl.SETUP = true;
 
-            do {
+            while (!gripper_ctl.BUSY)
                 System.Threading.Thread.Sleep(gripper_check_interval);
-            } while (gripper_ctl.BUSY);
 
             gripper_ctl.SETUP = false;
         }
@@ -327,6 +326,12 @@ namespace NEXCOMROBOT
                     throw new System.ArgumentException("State Stoppedr!", "STATE");
 
             } while(status != aim_status);
+        }
+
+        public void WaitGripperBusy()
+        {
+            while (gripper_ctl.BUSY)
+                System.Threading.Thread.Sleep(gripper_check_interval);
         }
         #endregion
 

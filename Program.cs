@@ -96,6 +96,7 @@ namespace NEXCOMROBOT
             ether_cat_net.GetRobotAgent(0).Enable();
             Console.WriteLine("\n[Enable]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
             ether_cat_net.GetRobotAgent(0).HomeGripper();
+            ether_cat_net.GetRobotAgent(0).WaitGripperBusy();
             Console.WriteLine("\n[Home]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
         }
     }
