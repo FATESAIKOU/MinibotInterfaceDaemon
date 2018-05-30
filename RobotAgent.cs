@@ -235,7 +235,7 @@ namespace NEXCOMROBOT
         {
             bool   is_gripped = gripper_ctl.INP;
             double current_pos = gripper_ctl.Current_Position / 100.0;
-            int    alarm_code = gripper_ctl.Alarme_1;
+            int    alarm_code = gripper_ctl.Alarm_1;
             bool   is_ready = gripper_ctl.Ready;
             bool   is_busy = gripper_ctl.BUSY;
 
@@ -253,15 +253,75 @@ namespace NEXCOMROBOT
 
         /* Gripper Moving */
         #region GripperMoving
-        public void HomeGripper()
+        public int HomeGripper()
         {
+            if ( gripper_ctl.BUSY || !gripper_ctl.Ready || gripper_ctl.ALARM )
+                return 1;
+
             gripper_ctl.SETUP = true;
 
-            while (!gripper_ctl.BUSY)
+            while (!gripper_ctl.BUSY && !gripper_ctl.ALARM)
                 System.Threading.Thread.Sleep(gripper_check_interval);
 
             gripper_ctl.SETUP = false;
+            
+            return gripper_ctl.ALARM ? 1:0;
         }
+
+        public int MoveGripper(ushort pushing_force, ushort trigger_LV)
+        {
+            if ( gripper_ctl.BUSY || !gripper_ctl.Ready || gripper_ctl.ALARM )
+                return 1;
+
+            gripper_ctl.DataFlag = 65535;
+            gripper_ctl.MovementMode = 1;
+            gripper_ctl.Positon = gripper_ctl.Current_Position - 10;
+            gripper_ctl.Speed = 100;
+            gripper_ctl.Acc = 100;
+            gripper_ctl.Dec = 100;
+            gripper_ctl.Pusing_Force = pushing_force;
+            gripper_ctl.Trigger_LV = trigger_LV;
+            gripper_ctl.Pushing_Speed = 10;
+            gripper_ctl.Moving_Force = 100;
+            gripper_ctl.Area_1 = 0;
+            gripper_ctl.Area_2 = 0;
+            gripper_ctl.In_Position = 5000;
+
+            gripper_ctl.StartFlag = true;
+            while (!gripper_ctl.BUSY && !gripper_ctl.ALARM)
+                System.Threading.Thread.Sleep(gripper_check_interval);
+            gripper_ctl.StartFlag = false;
+
+            return gripper_ctl.ALARM ? 1:0;
+        }
+
+        public int ReleaseGripper()
+        {
+            if ( gripper_ctl.BUSY || !gripper_ctl.Ready || gripper_ctl.ALARM )
+                return 1;
+
+            gripper_ctl.DataFlag = 65535;
+            gripper_ctl.MovementMode = 1;
+            gripper_ctl.Positon = 4800;
+            gripper_ctl.Speed = 100;
+            gripper_ctl.Acc = 100;
+            gripper_ctl.Dec = 100;
+            gripper_ctl.Pusing_Force = 50;
+            gripper_ctl.Trigger_LV = 40;
+            gripper_ctl.Pushing_Speed = 10;
+            gripper_ctl.Moving_Force = 100;
+            gripper_ctl.Area_1 = 0;
+            gripper_ctl.Area_2 = 0;
+            gripper_ctl.In_Position = 5000;
+
+            gripper_ctl.StartFlag = true;
+            while (!gripper_ctl.BUSY && !gripper_ctl.ALARM)
+                System.Threading.Thread.Sleep(gripper_check_interval);
+            gripper_ctl.StartFlag = false;
+
+            return gripper_ctl.ALARM ? 1:0;
+        }
+
         #endregion
 
         /* Other Utils */
@@ -328,10 +388,12 @@ namespace NEXCOMROBOT
             } while(status != aim_status);
         }
 
-        public void WaitGripperBusy()
+        public int WaitGripperBusy()
         {
             while (gripper_ctl.BUSY)
                 System.Threading.Thread.Sleep(gripper_check_interval);
+
+            return gripper_ctl.Alarm_1;
         }
         #endregion
 

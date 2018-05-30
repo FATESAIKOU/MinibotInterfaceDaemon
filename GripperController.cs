@@ -220,7 +220,7 @@ namespace NEXCOMROBOT
         #endregion
 
         #region 6030h Alarm 1
-        public byte Alarme_1
+        public byte Alarm_1
         {
             get
             {
