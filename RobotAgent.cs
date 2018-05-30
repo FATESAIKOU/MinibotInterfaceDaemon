@@ -275,7 +275,7 @@ namespace NEXCOMROBOT
 
             gripper_ctl.DataFlag = 65535;
             gripper_ctl.MovementMode = 1;
-            gripper_ctl.Positon = gripper_ctl.Current_Position - 10;
+            gripper_ctl.Positon = gripper_ctl.Current_Position - 1;
             gripper_ctl.Speed = 100;
             gripper_ctl.Acc = 100;
             gripper_ctl.Dec = 100;
