@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -32,6 +33,21 @@ namespace NEXCOMROBOT
             "GROUP_MOVING",
             "GROUP_STOPPED"
         };
+
+        public static int GetRobotStatusCode(string[] status)
+        {
+            int code = 0;
+            int ind = 0;
+            foreach(string s in status)
+            {
+                ind = Array.IndexOf(RobotStatusMap, s);
+                if (ind == -1) return -1;
+
+                code |= 1 << ind;
+            }
+
+            return code;
+        }
 
     }
     public class RobotStatus

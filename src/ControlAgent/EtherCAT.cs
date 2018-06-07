@@ -15,9 +15,9 @@ namespace NEXCOMROBOT
             this.OperatingMode = type;
         }
 
-        public void InitRobot()
+        public int InitRobot()
         {
-            mRobot.InitDevice(OperatingMode);
+            int ret = mRobot.InitDevice(OperatingMode);
 
             robots = new List<RobotAgent>();
 
@@ -35,6 +35,8 @@ namespace NEXCOMROBOT
                     robots.Add(tmp_agent);
                 }
             }
+
+            return ret;
         }
 
         public void InitIOForRobot(uint offset, int group_id)
