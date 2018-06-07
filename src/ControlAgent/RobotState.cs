@@ -34,20 +34,20 @@ namespace NEXCOMROBOT
         };
 
     }
-    public class RobotState
+    public class RobotStatus
     {
         public int state;
         public int status;
         public double[] acs;
         public double[] pcs;
-        public GripperState gripper_state;
+        public GripperStatus gripper_status;
 
         public string DumpJson()
         {
             return JsonConvert.SerializeObject(this.DoMap(), Formatting.Indented);
         }
 
-        public RobotStateReadable DoMap()
+        public RobotStatusReadable DoMap()
         {
             List<string> tmp_status = new List<string>();
             for (int i = 0; i < 15; i ++)
@@ -57,29 +57,29 @@ namespace NEXCOMROBOT
                 }
             }
 
-            RobotStateReadable robot_state_readable = new RobotStateReadable();
-            robot_state_readable.state = StateMaps.RobotStateMap[this.state];
-            robot_state_readable.status = tmp_status.ToArray();
-            robot_state_readable.acs = this.acs;
-            robot_state_readable.pcs = this.pcs;
+            RobotStatusReadable robot_status_readable = new RobotStatusReadable();
+            robot_status_readable.state = StateMaps.RobotStateMap[this.state];
+            robot_status_readable.status = tmp_status.ToArray();
+            robot_status_readable.acs = this.acs;
+            robot_status_readable.pcs = this.pcs;
             
-            if (this.gripper_state != null)
-                robot_state_readable.gripper_state_readable = this.gripper_state.DoMap();
+            if (this.gripper_status != null)
+                robot_status_readable.gripper_status_readable = this.gripper_status.DoMap();
 
-            return robot_state_readable;
+            return robot_status_readable;
         }
     }
 
-    public class RobotStateReadable
+    public class RobotStatusReadable
     {
         public string state;
         public string[] status;
         public double[] acs;
         public double[] pcs;
-        public GripperStateReadable gripper_state_readable;
+        public GripperStatusReadable gripper_status_readable;
     }
 
-    public class GripperState
+    public class GripperStatus
     {
         public bool is_ready;
         public bool is_busy;
@@ -92,20 +92,20 @@ namespace NEXCOMROBOT
             return JsonConvert.SerializeObject(this.DoMap(), Formatting.Indented);
         }
 
-        public GripperStateReadable DoMap()
+        public GripperStatusReadable DoMap()
         {
-            GripperStateReadable gripper_state_readable = new GripperStateReadable();
-            gripper_state_readable.is_ready = this.is_ready;
-            gripper_state_readable.is_busy = this.is_busy;
-            gripper_state_readable.is_gripped = this.is_gripped;
-            gripper_state_readable.current_pos = this.current_pos;
-            gripper_state_readable.alarm_code = this.alarm_code;
+            GripperStatusReadable gripper_status_readable = new GripperStatusReadable();
+            gripper_status_readable.is_ready = this.is_ready;
+            gripper_status_readable.is_busy = this.is_busy;
+            gripper_status_readable.is_gripped = this.is_gripped;
+            gripper_status_readable.current_pos = this.current_pos;
+            gripper_status_readable.alarm_code = this.alarm_code;
 
-            return gripper_state_readable;
+            return gripper_status_readable;
         }
     }
 
-    public class GripperStateReadable
+    public class GripperStatusReadable
     {
         public bool is_ready;
         public bool is_busy;

@@ -43,19 +43,19 @@ namespace NEXCOMROBOT
         
         /* State Getting */
         #region StateGetting
-        public RobotState GetStatus()
+        public RobotStatus GetStatus()
         {
             SysParamUpdate();
 
             var group_parameters = group_ctrl.GroupParameters;
-            RobotState robot_state = new RobotState();
-            robot_state.state = group_parameters.State;
-            robot_state.status = group_parameters.Status;
-            robot_state.acs = group_parameters.ActAcs;
-            robot_state.pcs = group_parameters.ActPcs;
-            robot_state.gripper_state = GetGripperStatus();
+            RobotStatus robot_status = new RobotStatus();
+            robot_status.state = group_parameters.State;
+            robot_status.status = group_parameters.Status;
+            robot_status.acs = group_parameters.ActAcs;
+            robot_status.pcs = group_parameters.ActPcs;
+            robot_status.gripper_status = GetGripperStatus();
 
-            return robot_state;
+            return robot_status;
         }
         #endregion
 
@@ -217,19 +217,19 @@ namespace NEXCOMROBOT
 
         /* Gripper State Getting */
         #region GripperStateGetting
-        public GripperState GetGripperStatus()
+        public GripperStatus GetGripperStatus()
         {
             if (gripper_ctl == default(GripperController))
                 return null;
 
-            GripperState gripper_state = new GripperState();
-            gripper_state.is_gripped = gripper_ctl.INP;
-            gripper_state.current_pos = gripper_ctl.Current_Position / 100.0;
-            gripper_state.alarm_code = gripper_ctl.Alarm_1;
-            gripper_state.is_ready = gripper_ctl.Ready;
-            gripper_state.is_busy = gripper_ctl.BUSY;
+            GripperStatus gripper_status = new GripperStatus();
+            gripper_status.is_gripped = gripper_ctl.INP;
+            gripper_status.current_pos = gripper_ctl.Current_Position / 100.0;
+            gripper_status.alarm_code = gripper_ctl.Alarm_1;
+            gripper_status.is_ready = gripper_ctl.Ready;
+            gripper_status.is_busy = gripper_ctl.BUSY;
 
-            return gripper_state;
+            return gripper_status;
         }
         #endregion
 
