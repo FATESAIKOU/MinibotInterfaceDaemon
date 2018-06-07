@@ -85,27 +85,28 @@ namespace NEXCOMROBOT
         static void GripperTest(EtherCAT ether_cat_net)
         {
             ether_cat_net.GetRobotAgent(0).Enable();
-            Console.WriteLine("\n[Enable]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
+            Console.WriteLine("\n[Enable]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus().DumpJson());
             ether_cat_net.GetRobotAgent(0).Disable();
-            Console.WriteLine("\n[Disable]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
+            Console.WriteLine("\n[Disable]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus().DumpJson());
             ether_cat_net.GetRobotAgent(0).Reset();
-            Console.WriteLine("\n[Reset]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
+            Console.WriteLine("\n[Reset]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus().DumpJson());
 
             ether_cat_net.GetRobotAgent(0).Enable();
-            Console.WriteLine("\n[Enable]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
+            Console.WriteLine("\n[Enable]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus().DumpJson());
 
             ether_cat_net.GetRobotAgent(0).HomeRobot(5);
             ether_cat_net.GetRobotAgent(0).WaitStatus(576, 100);
-            Console.WriteLine("\n[Start]\n" + ether_cat_net.GetRobotAgent(0).GetStatus());
+            Console.WriteLine("\n[Start]\n" + ether_cat_net.GetRobotAgent(0).GetStatus().DumpJson());
 
             ether_cat_net.GetRobotAgent(0).HomeGripper();            
             ether_cat_net.GetRobotAgent(0).WaitGripperBusy();
-            Console.WriteLine("\n[Home]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
+            Console.WriteLine("\n[Home]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus().DumpJson());
 
             Pos_T some_pos = new Pos_T();
             some_pos.pos = ether_cat_net.GetRobotAgent(0).group_ctrl.GroupParameters.ActAcs;
             Console.WriteLine(some_pos.pos[0]);
 
+            Console.WriteLine("\n[TEST]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus().DumpJson());
             for (int i = 0; i < 0; i ++)
             {
                 some_pos.pos[5] = -180;
@@ -113,14 +114,14 @@ namespace NEXCOMROBOT
                 ether_cat_net.GetRobotAgent(0).ReleaseGripper();
                 ether_cat_net.GetRobotAgent(0).WaitGripperBusy();
                 ether_cat_net.GetRobotAgent(0).WaitStatus(576, 100);
-                Console.WriteLine("\n[ReleaseGripper(" + i.ToString() + ")]\n" + ether_cat_net.GetRobotAgent(0).GetStatus());
+                Console.WriteLine("\n[ReleaseGripper(" + i.ToString() + ")]\n" + ether_cat_net.GetRobotAgent(0).GetStatus().DumpJson());
 
                 some_pos.pos[5] = 0;
                 ether_cat_net.GetRobotAgent(0).AcsPTP(some_pos);
                 ether_cat_net.GetRobotAgent(0).MoveGripper(50, 40);
                 ether_cat_net.GetRobotAgent(0).WaitGripperBusy();
                 ether_cat_net.GetRobotAgent(0).WaitStatus(576, 100);
-                Console.WriteLine("\n[MoveGripper(" + i.ToString() + ")]\n" + ether_cat_net.GetRobotAgent(0).GetStatus());
+                Console.WriteLine("\n[MoveGripper(" + i.ToString() + ")]\n" + ether_cat_net.GetRobotAgent(0).GetStatus().DumpJson());
             }
 
         }

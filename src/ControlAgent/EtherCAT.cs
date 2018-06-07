@@ -4,7 +4,7 @@ using NEXCOMROBOT.MCAT;
 
 namespace NEXCOMROBOT
 {
-    class EtherCAT
+    public class EtherCAT
     {
         private List<RobotAgent> robots;
         private SystemControl mRobot = new SystemControl();

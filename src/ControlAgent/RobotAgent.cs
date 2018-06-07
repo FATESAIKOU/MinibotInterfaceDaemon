@@ -3,7 +3,7 @@ using NEXCOMROBOT.MCAT;
 
 namespace NEXCOMROBOT
 {
-    class RobotAgent
+    public class RobotAgent
     {
         public GroupControl group_ctrl;
         public GripperController gripper_ctl;
@@ -43,33 +43,19 @@ namespace NEXCOMROBOT
         
         /* State Getting */
         #region StateGetting
-        public string GetStatus()
+        public RobotState GetStatus()
         {
             SysParamUpdate();
 
             var group_parameters = group_ctrl.GroupParameters;
-            
-            string status_string = "";
-            bool hf = false;
-            for (int i = 0; i < 15; i ++) {
-                if ( (group_parameters.Status & (1 << i)) > 0 ) {
-                    status_string += '"' + StatusMap[i] + "\",";
-                    hf = true;
-                }
-            }
-            if (hf) {
-                status_string = status_string.Substring(0, status_string.Length - 1);
-            }
+            RobotState robot_state = new RobotState();
+            robot_state.state = group_parameters.State;
+            robot_state.status = group_parameters.Status;
+            robot_state.acs = group_parameters.ActAcs;
+            robot_state.pcs = group_parameters.ActPcs;
+            robot_state.gripper_state = GetGripperStatus();
 
-            string json_result = "{";
-            json_result += "\"State\": \"" + StateMap[group_parameters.State] + "\",\n";
-            json_result += "\"Status\": [" + status_string + "],\n";            
-            json_result += "\"Acs\": [" + string.Join(",", group_parameters.ActAcs) + "],\n";
-            json_result += "\"Pcs\": [" + string.Join(",", group_parameters.ActPcs) + "]\n";
-            json_result += "\"Gripper\":" + GetGripperStatus() + "\n";
-            json_result += "}";
-
-            return json_result;
+            return robot_state;
         }
         #endregion
 
@@ -231,23 +217,16 @@ namespace NEXCOMROBOT
 
         /* Gripper State Getting */
         #region GripperStateGetting
-        public string GetGripperStatus()
+        public GripperState GetGripperStatus()
         {
-            bool   is_gripped = gripper_ctl.INP;
-            double current_pos = gripper_ctl.Current_Position / 100.0;
-            int    alarm_code = gripper_ctl.Alarm_1;
-            bool   is_ready = gripper_ctl.Ready;
-            bool   is_busy = gripper_ctl.BUSY;
+            GripperState gripper_state = new GripperState();
+            gripper_state.is_gripped = gripper_ctl.INP;
+            gripper_state.current_pos = gripper_ctl.Current_Position / 100.0;
+            gripper_state.alarm_code = gripper_ctl.Alarm_1;
+            gripper_state.is_ready = gripper_ctl.Ready;
+            gripper_state.is_busy = gripper_ctl.BUSY;
 
-            string status_string = "{\n";
-            status_string += "\"IsGripped\": " + is_gripped.ToString() + ",\n";
-            status_string += "\"CurrentPos\": " + current_pos.ToString() + ",\n";
-            status_string += "\"AlarmCode\": " + alarm_code.ToString() + ",\n";
-            status_string += "\"IsReady\": " + is_ready.ToString() + ",\n";
-            status_string += "\"IsBusy\": " + is_busy.ToString() + ",\n";
-            status_string += "}\n";
-
-            return status_string;
+            return gripper_state;
         }
         #endregion
 
