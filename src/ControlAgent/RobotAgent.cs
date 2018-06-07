@@ -5,7 +5,7 @@ namespace NEXCOMROBOT
 {
     class RobotAgent
     {
-        private GroupControl group_ctrl;
+        public GroupControl group_ctrl;
         public GripperController gripper_ctl;
 
         public RobotAgent(GroupControl group_ctrl)

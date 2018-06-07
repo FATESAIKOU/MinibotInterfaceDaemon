@@ -94,20 +94,35 @@ namespace NEXCOMROBOT
             ether_cat_net.GetRobotAgent(0).Enable();
             Console.WriteLine("\n[Enable]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
 
-            ether_cat_net.GetRobotAgent(0).HomeGripper();
+            ether_cat_net.GetRobotAgent(0).HomeRobot(5);
+            ether_cat_net.GetRobotAgent(0).WaitStatus(576, 100);
+            Console.WriteLine("\n[Start]\n" + ether_cat_net.GetRobotAgent(0).GetStatus());
+
+            ether_cat_net.GetRobotAgent(0).HomeGripper();            
             ether_cat_net.GetRobotAgent(0).WaitGripperBusy();
             Console.WriteLine("\n[Home]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
 
-            ether_cat_net.GetRobotAgent(0).ReleaseGripper();
-            Console.WriteLine("\n[ReleaseGripper]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
-            ether_cat_net.GetRobotAgent(0).WaitGripperBusy();
-            Console.WriteLine("\n[ReleaseGripper]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
+            Pos_T some_pos = new Pos_T();
+            some_pos.pos = ether_cat_net.GetRobotAgent(0).group_ctrl.GroupParameters.ActAcs;
+            Console.WriteLine(some_pos.pos[0]);
 
-            ether_cat_net.GetRobotAgent(0).MoveGripper(50, 40);
-            Console.WriteLine("\n[MoveGripper]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
-            ether_cat_net.GetRobotAgent(0).WaitGripperBusy();
-            Console.WriteLine("\n[MoveGripper]\n" + ether_cat_net.GetRobotAgent(0).GetGripperStatus());
-            
+            for (int i = 0; i < 0; i ++)
+            {
+                some_pos.pos[5] = -180;
+                ether_cat_net.GetRobotAgent(0).AcsPTP(some_pos);
+                ether_cat_net.GetRobotAgent(0).ReleaseGripper();
+                ether_cat_net.GetRobotAgent(0).WaitGripperBusy();
+                ether_cat_net.GetRobotAgent(0).WaitStatus(576, 100);
+                Console.WriteLine("\n[ReleaseGripper(" + i.ToString() + ")]\n" + ether_cat_net.GetRobotAgent(0).GetStatus());
+
+                some_pos.pos[5] = 0;
+                ether_cat_net.GetRobotAgent(0).AcsPTP(some_pos);
+                ether_cat_net.GetRobotAgent(0).MoveGripper(50, 40);
+                ether_cat_net.GetRobotAgent(0).WaitGripperBusy();
+                ether_cat_net.GetRobotAgent(0).WaitStatus(576, 100);
+                Console.WriteLine("\n[MoveGripper(" + i.ToString() + ")]\n" + ether_cat_net.GetRobotAgent(0).GetStatus());
+            }
+
         }
     }
 }
