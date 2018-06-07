@@ -330,7 +330,7 @@ namespace NEXCOMROBOT
             int pos;
             foreach (string s in valid_status)
             {
-                pos = Array.IndexOf(StatusMap, s);
+                pos = Array.IndexOf(StateMaps.RobotStatusMap, s);
 
                 if (pos == -1) {
                     throw new System.ArgumentException(
@@ -377,34 +377,6 @@ namespace NEXCOMROBOT
         #endregion
 
         /* Decoder */
-        private string[] StateMap = new string[] {
-            "GROUP_DISABLE",
-            "GROUP_STAND_STILL",
-            "GROUP_STOPPED",
-            "GROUP_STOPPING",
-            "GROUP_MOVING",
-            "GROUP_HOMING",
-            "GROUP_ERROR_STOP"
-        };
-
-        private string[] StatusMap = new string[] {
-            "OUTER_EMGSTOP",
-            "DRIVER_ALARM",
-            "HW_PLIM_EXCEED",
-            "HW_NLIM_EXCEED",
-            "SW_PLIM_EXCEED",
-            "SW_NLIM_EXCEED",
-            "ALL_STAND_STILL",
-            "GROUP_ERR_STOP",
-            "",
-            "NO_POS_CHG",
-            "PCS_ACC_MOV",
-            "PCS_DCC_MOV",
-            "PCS_MAX_MOV",
-            "GROUP_MOVING",
-            "GROUP_STOPPED"
-        };
-
         public string[] AvalibleStatus { get; set; } = new string[] {
             "ALL_STAND_STILL",
             "NO_POS_CHG",
