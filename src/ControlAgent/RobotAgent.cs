@@ -219,6 +219,9 @@ namespace NEXCOMROBOT
         #region GripperStateGetting
         public GripperState GetGripperStatus()
         {
+            if (gripper_ctl == default(GripperController))
+                return null;
+
             GripperState gripper_state = new GripperState();
             gripper_state.is_gripped = gripper_ctl.INP;
             gripper_state.current_pos = gripper_ctl.Current_Position / 100.0;

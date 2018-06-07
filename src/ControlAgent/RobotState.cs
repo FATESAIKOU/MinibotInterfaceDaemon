@@ -62,7 +62,9 @@ namespace NEXCOMROBOT
             robot_state_readable.status = tmp_status.ToArray();
             robot_state_readable.acs = this.acs;
             robot_state_readable.pcs = this.pcs;
-            robot_state_readable.gripper_state_readable = this.gripper_state.DoMap();
+            
+            if (this.gripper_state != null)
+                robot_state_readable.gripper_state_readable = this.gripper_state.DoMap();
 
             return robot_state_readable;
         }
