@@ -1,4 +1,5 @@
 ﻿using System;
+using DaemonCore;
 using NEXCOMROBOT.MCAT;
 
 //namespace work
@@ -8,20 +9,92 @@ namespace NEXCOMROBOT
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            
-            EtherCAT ether_cat_net = new EtherCAT();
-            //ether_cat_net.SetMode(NexMotion_Define.DEV_TYPE_ETHERCAT);
+            Console.WriteLine("Hello, World");
 
-            ether_cat_net.InitRobot();
-            Console.WriteLine(ether_cat_net.GetRobotAgent(0).GetStatus().DumpJson());
-            ether_cat_net.InitIOForRobot(2, 0);
-            //StateTest(ether_cat_net);
-            //MotionTest(ether_cat_net);
-            GripperTest(ether_cat_net);
-            ether_cat_net.Shutdown();        
+            Route router = new Route();
+            //Route router = new Route(NexMotion_Define.DEV_TYPE_ETHERCAT);
+            //StateTest(router);
+            //MotionTest(router);
+            GripperTest(router);       
+
+            Console.WriteLine("Bye, World");
         }
 
+        static void StateTest(Route router)
+        {
+            Console.WriteLine( "[Enable]" + router.DoRoute("Robot", "Enable", null).DumpJson() );
+            Console.WriteLine( "[Disable]" + router.DoRoute("Robot", "Disable", null).DumpJson() );
+            Console.WriteLine( "[Enable]" + router.DoRoute("Robot", "Enable", null).DumpJson() );
+            Console.WriteLine( "[Reset]" + router.DoRoute("Robot", "Reset", null).DumpJson() );
+        }
+
+        static void MotionTest(Route router)
+        {
+            Console.WriteLine( "[Enable]" + router.DoRoute("Robot", "Enable", null).DumpJson() );
+
+            Console.WriteLine( "[Home]" + router.DoRoute("Robot", "Home", new object[]{0}).DumpJson() );
+            Console.WriteLine( "[Home-End]" + router.DoRoute("Robot", "Wait", new object[]{576, 100}).DumpJson() );
+            Console.WriteLine( "\n" );
+
+            Console.WriteLine( "[HomeAll]" + router.DoRoute("Robot", "HomeAll", null).DumpJson() );
+            Console.WriteLine( "[HomeAll-End]" + router.DoRoute("Robot", "Wait", new object[]{576, 100}).DumpJson() );
+            Console.WriteLine( "\n" );
+
+            
+            Console.WriteLine( "[AcsJog]" + router.DoRoute("Robot", "AcsJog", new object[]{0, 0, 1000}).DumpJson() );
+            Console.WriteLine( "[AcsJog-End]" + router.DoRoute("Robot", "Wait", new object[]{576, 100}).DumpJson() );
+            Console.WriteLine( "\n" );
+
+            
+            Console.WriteLine( "[PcsLine]" + router.DoRoute("Robot", "PcsLine", new object[]{new double[]{330, 10, -6, 0, 0, -180}}).DumpJson() );
+            Console.WriteLine( "[PcsLine-End]" + router.DoRoute("Robot", "Wait", new object[]{576, 100}).DumpJson() );
+            Console.WriteLine( "\n" );
+
+            Console.WriteLine( "[AcsPTP]" + router.DoRoute("Robot", "AcsPTP", new object[]{new double[]{90, 90, 90, 90, 90, 90}}).DumpJson() );
+            Console.WriteLine( "[AcsPTP-End]" + router.DoRoute("Robot", "Wait", new object[]{576, 100}).DumpJson() );
+            Console.WriteLine( "\n" );
+
+            Console.WriteLine( "[PcsPTP]" + router.DoRoute("Robot", "PcsPTP", new object[]{new double[]{93, 9, 821, 87, -0.1, 106}}).DumpJson() );
+            Console.WriteLine( "[PcsPTP-End]" + router.DoRoute("Robot", "Wait", new object[]{576, 100}).DumpJson() );
+            Console.WriteLine( "" );
+        }
+
+        static void GripperTest(Route router)
+        {
+            Console.WriteLine( "[Enable]" + router.DoRoute("Robot", "Enable", null).DumpJson() );
+
+            Console.WriteLine( "[Home]" + router.DoRoute("Robot", "Home", new object[]{5}).DumpJson() );
+            Console.WriteLine( "[Home-End]" + router.DoRoute("Robot", "Wait", new object[]{576, 100}).DumpJson() );
+            Console.WriteLine( "\n" );
+
+            Console.WriteLine( "[HomeGripper]" );
+            router.ether_cat_net.GetRobotAgent(0).HomeGripper(); // No Such Interface;
+            Console.WriteLine( "[HomeGripper-End]" + router.DoRoute("Robot", "WaitGripper", new object[]{100}).DumpJson() );
+            Console.WriteLine( "\n" );
+
+            double[] some_pos = router.ether_cat_net.GetRobotAgent(0).group_ctrl.GroupParameters.ActAcs;
+            Console.WriteLine(some_pos);
+
+            Console.WriteLine("\n[TEST]\n" + router.ether_cat_net.GetRobotAgent(0).GetGripperStatus().DumpJson());
+
+            RobotStatus now_state;
+            for (int i = 0; i < 0; i ++)
+            {
+                some_pos[5] = -180;
+                router.DoRoute("Robot", "AcsPTP", new object[]{some_pos});
+                router.DoRoute("Robot", "Release", null);
+                router.DoRoute("Robot", "WaitGripper", new object[]{100});
+                now_state = router.DoRoute("Robot", "Wait", new object[]{576, 100});
+                Console.WriteLine("\n[ReleaseGripper(" + i.ToString() + ")]\n" + now_state.DumpJson());
+
+                some_pos[5] = 0;
+                router.DoRoute("Robot", "AcsPTP", new object[]{some_pos});
+                router.DoRoute("Robot", "Grip", new object[]{(ushort)50, (ushort)40});
+                router.DoRoute("Robot", "WaitGripper", new object[]{100});
+                now_state = router.DoRoute("Robot", "Wait", new object[]{576, 100});
+                Console.WriteLine("\n[MoveGripper(" + i.ToString() + ")]\n" + now_state.DumpJson());
+            }            
+        }
 
         static void StateTest(EtherCAT ether_cat_net)
         {
