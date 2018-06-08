@@ -33,16 +33,19 @@ namespace Controller
         #region StateControl
         static private RobotStatus Enable(RobotAgent robot_agent, object[] args)
         {
+            robot_agent.Enable();
             return robot_agent.GetStatus();
         }
 
         static private RobotStatus Disable(RobotAgent robot_agent, object[] args)
         {
+            robot_agent.Disable();
             return robot_agent.GetStatus();
         }
 
         static private RobotStatus Reset(RobotAgent robot_agent, object[] args)
         {
+            robot_agent.Reset();
             return robot_agent.GetStatus();
         }
         #endregion        
