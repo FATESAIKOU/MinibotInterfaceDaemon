@@ -17,7 +17,7 @@ namespace Controller
         };
 
         static private int MAX_VEL = 20;
-        static private int WAIT_TIMEOUT = 3000;
+        static private int WAIT_TIMEOUT = 30000;
 
         static public RobotStatus Do(RobotAgent robot_agent, string action, object[] args)
         {
