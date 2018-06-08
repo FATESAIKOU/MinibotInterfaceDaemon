@@ -352,10 +352,12 @@ namespace NEXCOMROBOT
             }
         }
 
-        public void WaitStatus(int aim_status, int interval)
+        public void WaitStatus(int aim_status, int interval, int timeout = int.MaxValue)
         {            
             int status = 0;
             int state = 0;
+
+            DateTime start_time = DateTime.Now;
             do {
                 group_ctrl.GroupAdapter.NMC_GroupGetState(ref state);
                 group_ctrl.GroupAdapter.NMC_GroupGetStatus(ref status);
@@ -367,12 +369,16 @@ namespace NEXCOMROBOT
                 if (state == NexMotion_Define.GROUP_STATE_STOPPED)
                     throw new System.ArgumentException("State Stoppedr!", "STATE");
 
-            } while(status != aim_status);
+            } while( status != aim_status && 
+                ((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds < timeout
+            );
         }
 
-        public int WaitGripperBusy()
+        public int WaitGripperBusy(int timeout = int.MaxValue)
         {
-            while (gripper_ctl.BUSY)
+            DateTime start_time = DateTime.Now;
+            while ( gripper_ctl.BUSY &&
+                ((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds < timeout )
                 System.Threading.Thread.Sleep(gripper_check_interval);
 
             return gripper_ctl.Alarm_1;
