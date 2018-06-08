@@ -13,7 +13,8 @@ namespace Controller
             { "Home", Home }, {"HomeAll", HomeAll},
             { "AcsJog", AcsJog }, { "PcsLine", PcsLine }, { "AcsPTP", AcsPTP }, { "PcsPTP", PcsPTP },
             { "Release", Release }, { "Grip", Grip },
-            { "Wait", Wait }, { "WaitGripper", WaitGripper }
+            { "Wait", Wait }, { "WaitGripper", WaitGripper },
+            { "SetPos", SetPos }
         };
 
         static private int MAX_VEL = 20;
@@ -127,7 +128,8 @@ namespace Controller
 
         static private RobotStatus Grip(RobotAgent robot_agent, object[] args)
         {
-            robot_agent.MoveGripper((ushort)args[0], (ushort)args[1]);
+            robot_agent.MoveGripper(Convert.ToUInt16(args[0]), Convert.ToUInt16(args[1]));
+
             return robot_agent.GetStatus();
         }
         #endregion
@@ -142,6 +144,17 @@ namespace Controller
         {
             robot_agent.WaitGripperBusy((int)args[0], WAIT_TIMEOUT);
             return robot_agent.GetStatus();
+        }
+        #endregion
+        #region System
+        static private RobotStatus SetPos(RobotAgent robot_agent, object[] args)
+        {
+            Pos_T target = new Pos_T();
+            target.pos = (double[])args[0];
+            
+            robot_agent.SetHomePos(target);
+
+            return robot_agent.GetStatus();            
         }
         #endregion
     }
