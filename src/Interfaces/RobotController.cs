@@ -52,11 +52,18 @@ namespace Controller
         #region Initialize
         static private RobotStatus Home(RobotAgent robot_agent, object[] args)
         {
+            if ( !args[0].GetType().Equals(typeof(int)) )
+                new System.TypeAccessException("Expect int but got " + args[0].GetType().ToString());
+
+            robot_agent.HomeRobot( (int)args[0] );
+
             return robot_agent.GetStatus();
         }
 
         static private RobotStatus HomeAll(RobotAgent robot_agent, object[] args)
         {
+            robot_agent.HomeAll();
+            
             return robot_agent.GetStatus();
         }
         #endregion
