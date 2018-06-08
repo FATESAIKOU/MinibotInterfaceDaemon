@@ -1,5 +1,6 @@
 ﻿using System;
 using DaemonCore;
+using DaemonInterface;
 using NEXCOMROBOT.MCAT;
 
 //namespace work
@@ -13,9 +14,7 @@ namespace NEXCOMROBOT
 
             Route router = new Route();
             //Route router = new Route(NexMotion_Define.DEV_TYPE_ETHERCAT);
-            //StateTest(router);
-            //MotionTest(router);
-            GripperTest(router);       
+            Stdio.StartHandle(router);
 
             Console.WriteLine("Bye, World");
         }
