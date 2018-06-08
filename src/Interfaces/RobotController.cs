@@ -52,12 +52,12 @@ namespace Controller
             robot_agent.Reset();
             return robot_agent.GetStatus();
         }
-        #endregion        
+        #endregion
         #region Initialize
         static private RobotStatus Home(RobotAgent robot_agent, object[] args)
         {
-            if ( !args[0].GetType().Equals(typeof(int)) )
-                new System.TypeAccessException("Expect int but got " + args[0].GetType().ToString());
+            if ( (int)args[0] < 0 || 5 < (int)args[0] )
+                throw new System.ArgumentOutOfRangeException("AxisId out of range!!", "AxisId(args[0])");
 
             robot_agent.HomeRobot( (int)args[0] );
 
@@ -73,11 +73,7 @@ namespace Controller
         #endregion
         #region RobotMove
         static private RobotStatus AcsJog(RobotAgent robot_agent, object[] args)
-        {
-            for (int i = 0; i < 3; i ++) 
-                if ( !args[0].GetType().Equals(typeof(int)) )
-                    new System.TypeAccessException("Expect int but got " + args[0].GetType().ToString());
-            
+        {            
             if ( (int)args[0] < 0 || 5 < (int)args[0] )
                 throw new System.ArgumentOutOfRangeException("AxisId out of range!!", "AxisId(args[0])");
 
@@ -94,9 +90,6 @@ namespace Controller
 
         static private RobotStatus PcsLine(RobotAgent robot_agent, object[] args)
         {
-            if ( !args[0].GetType().Equals(typeof(double[])) )
-                new System.TypeAccessException("Expect double[] but got " + args[0].GetType().ToString());
-
             Pos_T dest = new Pos_T();
             dest.pos = (double[])args[0];
             
@@ -107,9 +100,6 @@ namespace Controller
 
         static private RobotStatus AcsPTP(RobotAgent robot_agent, object[] args)
         {
-            if ( !args[0].GetType().Equals(typeof(double[])) )
-                new System.TypeAccessException("Expect double[] but got " + args[0].GetType().ToString());
-
             Pos_T dest = new Pos_T();
             dest.pos = (double[])args[0];
             
@@ -120,9 +110,6 @@ namespace Controller
 
         static private RobotStatus PcsPTP(RobotAgent robot_agent, object[] args)
         {
-            if ( !args[0].GetType().Equals(typeof(double[])) )
-                new System.TypeAccessException("Expect double[] but got " + args[0].GetType().ToString());
-
             Pos_T dest = new Pos_T();
             dest.pos = (double[])args[0];
             
@@ -134,32 +121,25 @@ namespace Controller
         #region GripperMove
         static private RobotStatus Release(RobotAgent robot_agent, object[] args)
         {
+            robot_agent.ReleaseGripper();
             return robot_agent.GetStatus();
         }
 
         static private RobotStatus Grip(RobotAgent robot_agent, object[] args)
         {
+            robot_agent.MoveGripper((ushort)args[0], (ushort)args[1]);
             return robot_agent.GetStatus();
         }
         #endregion
         #region Wait
         static private RobotStatus Wait(RobotAgent robot_agent, object[] args)
         {
-            if ( !args[0].GetType().Equals(typeof(int)) )
-                new System.TypeAccessException("Expect int but got " + args[0].GetType().ToString());
-
-            if ( !args[1].GetType().Equals(typeof(int)) )
-                new System.TypeAccessException("Expect int but got " + args[1].GetType().ToString());
-
             robot_agent.WaitStatus((int)args[0], (int)args[1], WAIT_TIMEOUT);
             return robot_agent.GetStatus();
         }
 
         static private RobotStatus WaitGripper(RobotAgent robot_agent, object[] args)
         {
-            if ( !args[0].GetType().Equals(typeof(int)) )
-                new System.TypeAccessException("Expect int but got " + args[0].GetType().ToString());
-                
             robot_agent.WaitGripperBusy((int)args[0], WAIT_TIMEOUT);
             return robot_agent.GetStatus();
         }
