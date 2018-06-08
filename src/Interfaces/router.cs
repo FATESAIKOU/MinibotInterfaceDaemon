@@ -7,7 +7,7 @@ namespace DaemonCore
 {
     public class Route
     {
-        private EtherCAT ether_cat_net;
+        public EtherCAT ether_cat_net;
 
         public Route(int mode = NexMotion_Define.DEV_TYPE_SIMULATION)
         {
@@ -34,6 +34,11 @@ namespace DaemonCore
                 default:
                     throw new System.ArgumentException("No Such Target!!", "target");
             }
+        }
+
+        ~Route()
+        {
+            ether_cat_net.Shutdown();
         }
     }
 }
