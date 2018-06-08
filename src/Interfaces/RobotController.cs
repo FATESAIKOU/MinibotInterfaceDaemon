@@ -17,6 +17,7 @@ namespace Controller
         };
 
         static private int MAX_VEL = 20;
+        static private int WAIT_TIMEOUT = 3000;
 
         static public RobotStatus Do(RobotAgent robot_agent, string action, object[] args)
         {
@@ -144,11 +145,22 @@ namespace Controller
         #region Wait
         static private RobotStatus Wait(RobotAgent robot_agent, object[] args)
         {
+            if ( !args[0].GetType().Equals(typeof(int)) )
+                new System.TypeAccessException("Expect int but got " + args[0].GetType().ToString());
+
+            if ( !args[1].GetType().Equals(typeof(int)) )
+                new System.TypeAccessException("Expect int but got " + args[1].GetType().ToString());
+
+            robot_agent.WaitStatus((int)args[0], (int)args[1], WAIT_TIMEOUT);
             return robot_agent.GetStatus();
         }
 
         static private RobotStatus WaitGripper(RobotAgent robot_agent, object[] args)
         {
+            if ( !args[0].GetType().Equals(typeof(int)) )
+                new System.TypeAccessException("Expect int but got " + args[0].GetType().ToString());
+                
+            robot_agent.WaitGripperBusy((int)args[0], WAIT_TIMEOUT);
             return robot_agent.GetStatus();
         }
         #endregion
