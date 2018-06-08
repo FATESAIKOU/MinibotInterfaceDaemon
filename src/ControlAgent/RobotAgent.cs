@@ -374,12 +374,12 @@ namespace NEXCOMROBOT
             );
         }
 
-        public int WaitGripperBusy(int timeout = int.MaxValue)
+        public int WaitGripperBusy(int interval = 100, int timeout = int.MaxValue)
         {
             DateTime start_time = DateTime.Now;
             while ( gripper_ctl.BUSY &&
                 ((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds < timeout )
-                System.Threading.Thread.Sleep(gripper_check_interval);
+                System.Threading.Thread.Sleep(interval);
 
             return gripper_ctl.Alarm_1;
         }
