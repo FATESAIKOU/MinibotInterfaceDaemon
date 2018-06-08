@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using NEXCOMROBOT;
+using NEXCOMROBOT.MCAT;
 
 namespace Controller
 {
@@ -14,6 +15,8 @@ namespace Controller
             { "Release", Release }, { "Grip", Grip },
             { "Wait", Wait }, { "WaitGripper", WaitGripper }
         };
+
+        static private int MAX_VEL = 20;
 
         static public RobotStatus Do(RobotAgent robot_agent, string action, object[] args)
         {
@@ -63,28 +66,67 @@ namespace Controller
         static private RobotStatus HomeAll(RobotAgent robot_agent, object[] args)
         {
             robot_agent.HomeAll();
-            
+
             return robot_agent.GetStatus();
         }
         #endregion
         #region RobotMove
         static private RobotStatus AcsJog(RobotAgent robot_agent, object[] args)
         {
+            for (int i = 0; i < 3; i ++) 
+                if ( !args[0].GetType().Equals(typeof(int)) )
+                    new System.TypeAccessException("Expect int but got " + args[0].GetType().ToString());
+            
+            if ( (int)args[0] < 0 || 5 < (int)args[0] )
+                throw new System.ArgumentOutOfRangeException("AxisId out of range!!", "AxisId(args[0])");
+
+            if ( (int)args[1] != 0 && (int)args[1] != 1 )
+                throw new System.NotSupportedException("Not supported direction!!: Dir(args[1])");
+
+            if ( (int)args[2] < 0 || 2000 < (int)args[2] )
+                throw new System.ArgumentOutOfRangeException("Interval out of range!!", "Interval(args[2])");
+
+            robot_agent.AcsJog((int)args[0], (int)args[1], (int)args[2], MAX_VEL);
+
             return robot_agent.GetStatus();
         }
 
         static private RobotStatus PcsLine(RobotAgent robot_agent, object[] args)
         {
+            if ( !args[0].GetType().Equals(typeof(double[])) )
+                new System.TypeAccessException("Expect double[] but got " + args[0].GetType().ToString());
+
+            Pos_T dest = new Pos_T();
+            dest.pos = (double[])args[0];
+            
+            robot_agent.PcsLine(dest, MAX_VEL);
+
             return robot_agent.GetStatus();
         }
 
         static private RobotStatus AcsPTP(RobotAgent robot_agent, object[] args)
         {
+            if ( !args[0].GetType().Equals(typeof(double[])) )
+                new System.TypeAccessException("Expect double[] but got " + args[0].GetType().ToString());
+
+            Pos_T dest = new Pos_T();
+            dest.pos = (double[])args[0];
+            
+            robot_agent.AcsPTP(dest);
+
             return robot_agent.GetStatus();
         }
 
         static private RobotStatus PcsPTP(RobotAgent robot_agent, object[] args)
         {
+            if ( !args[0].GetType().Equals(typeof(double[])) )
+                new System.TypeAccessException("Expect double[] but got " + args[0].GetType().ToString());
+
+            Pos_T dest = new Pos_T();
+            dest.pos = (double[])args[0];
+            
+            robot_agent.PcsPTP(dest);
+
             return robot_agent.GetStatus();
         }
         #endregion
