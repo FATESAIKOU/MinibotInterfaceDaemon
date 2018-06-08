@@ -363,12 +363,15 @@ namespace NEXCOMROBOT
                 group_ctrl.GroupAdapter.NMC_GroupGetStatus(ref status);
                 System.Threading.Thread.Sleep(interval);
                 
-                if (state == NexMotion_Define.GROUP_STATE_ERROR)
+                if (state == NexMotion_Define.GROUP_STATE_ERROR) {
+                    this.EMGStop();
                     throw new System.ArgumentException("State Error!", "STATE");
+                }
 
-                if (state == NexMotion_Define.GROUP_STATE_STOPPED)
-                    throw new System.ArgumentException("State Stoppedr!", "STATE");
-
+                if (state == NexMotion_Define.GROUP_STATE_STOPPED) {
+                    this.EMGStop();
+                    throw new System.ArgumentException("State Stopped!", "STATE");
+                }
             } while( status != aim_status && 
                 ((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds < timeout
             );
