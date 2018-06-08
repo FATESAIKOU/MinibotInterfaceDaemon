@@ -7,21 +7,18 @@ namespace DaemonCore
 {
     public class Route
     {
-        EtherCAT ether_cat_net;
+        private EtherCAT ether_cat_net;
 
-        public int EnableRoute()
+        public Route(int mode = NexMotion_Define.DEV_TYPE_SIMULATION)
         {
-            int ret = NexMotion_ErrCode.NMCERR_SUCCESS;
-
             ether_cat_net = new EtherCAT();
-            ret = ether_cat_net.InitRobot();
+            ether_cat_net.SetMode(mode);
 
+            int ret = ether_cat_net.InitRobot();
             if (ret != NexMotion_ErrCode.NMCERR_SUCCESS)
                 throw new System.SystemException("Unable to openup device(" + ret.ToString() + ")!!");
 
             ether_cat_net.InitIOForRobot(2, 0);
-
-            return ret;
         }
         
         public RobotStatus DoRoute(string target, string action, object[] args)
