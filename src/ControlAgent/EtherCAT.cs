@@ -61,6 +61,9 @@ namespace NEXCOMROBOT
 
         public void Shutdown()
         {
+            foreach (RobotAgent robot_agent in robots)
+                robot_agent.Disable();
+                
             mRobot.DeviceAdapter.NMC_DeviceShutdown();
         }
 
