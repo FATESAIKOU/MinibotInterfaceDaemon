@@ -1,0 +1,3 @@
+Robot AcsJog 0 0 100
+Robot Wait 576 100
+Exit

@@ -36,7 +36,7 @@ namespace DaemonInterface
 
                 if (target == "Exec")
                 {
-                    ExecFile(router, action);
+                    ExecFile(router, action, args);
                 }
                 else
                 {
@@ -44,7 +44,7 @@ namespace DaemonInterface
                 }
             }
 
-            dest.WriteLine("End of Stdio Handler.");
+            Console.WriteLine("End of Stdio Handler.");
         }
 
         static private (string, string, object[], int) ParseCmd(string cmd)
@@ -87,7 +87,11 @@ namespace DaemonInterface
                     }
                     else
                     {
-                        args.Add( Convert.ToInt32(m[i].Groups[0].Value) );
+                        int v;
+                        if ( Int32.TryParse(m[i].Groups[0].Value, out v) )
+                            args.Add( v );
+                        else
+                            args.Add( m[i].Groups[0].Value );
                     }
                 }
             }
@@ -101,14 +105,24 @@ namespace DaemonInterface
             return (target, action, args.ToArray(), 0);
         }
 
-        static private void ExecFile(Route router, string file_path)
+        static private void ExecFile(Route router, string file_path, object[] args)
         {
-            StreamReader src = new StreamReader(file_path);
-            StreamWriter dest = new StreamWriter(file_path + "_out");
+            StreamReader src;
+            StreamWriter curr_dest = new System.IO.StreamWriter(Console.OpenStandardOutput());
 
-            Console.WriteLine("Start Exec File: " + file_path);
-            StartHandle(router, src, dest);
-            Console.WriteLine("End of Exec File: " + file_path);
+            int limit = 1;
+            if (args.Length > 0) limit = (int)args[0];
+
+            for (int i = 0; i < limit; i ++)
+            {
+                src = new StreamReader(file_path);
+
+                Console.WriteLine("Start Exec File: " + file_path);
+                StartHandle(router, src, curr_dest);
+                Console.WriteLine("End of Exec File: " + file_path);
+                
+                src.Close();
+            }
         }
     }
 }
