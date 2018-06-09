@@ -9,7 +9,7 @@ namespace DaemonCore
     {
         public EtherCAT ether_cat_net;
 
-        public Route(int mode = NexMotion_Define.DEV_TYPE_SIMULATION)
+        public void Start(int mode = NexMotion_Define.DEV_TYPE_SIMULATION)
         {
             ether_cat_net = new EtherCAT();
             ether_cat_net.SetMode(mode);
@@ -36,7 +36,7 @@ namespace DaemonCore
             }
         }
 
-        ~Route()
+        public void Shudown()
         {
             ether_cat_net.Shutdown();
         }

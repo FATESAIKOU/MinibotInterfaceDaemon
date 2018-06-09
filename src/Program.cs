@@ -13,8 +13,11 @@ namespace NEXCOMROBOT
             Console.WriteLine("Hello, World");
 
             Route router = new Route();
-            //Route router = new Route(NexMotion_Define.DEV_TYPE_ETHERCAT);
+            router.Start();
+            //router.Start(NexMotion_Define.DEV_TYPE_ETHERCAT);
             Stdio.StartHandle(router);
+
+            router.Shudown();
 
             Console.WriteLine("Bye, World");
         }
