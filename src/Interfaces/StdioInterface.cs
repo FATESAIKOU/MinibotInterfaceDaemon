@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DaemonCore;
@@ -8,7 +9,7 @@ namespace DaemonInterface
 {
     static public class Stdio
     {
-        static public void StartHandle(Route router)
+        static public void StartHandle(Route router, StreamReader src, StreamWriter dest)
         {
             Console.WriteLine("Start of Stdio Handler.");
 
@@ -19,8 +20,8 @@ namespace DaemonInterface
 
             while (true)
             {
-                Console.Write("[Command]: ");
-                cmd = Console.ReadLine();
+                dest.Write("[Command]: ");
+                cmd = src.ReadLine();
 
                 if (cmd == "Exit")
                     break;
@@ -31,12 +32,19 @@ namespace DaemonInterface
                     Console.WriteLine("Invalid command format.");
                     continue;
                 }
+                dest.WriteLine("[GetCommand]: " + target + " " + action + " " + JsonConvert.SerializeObject(args, Formatting.Indented));
 
-                Console.WriteLine("[GetCommand]: " + target + " " + action + " " + JsonConvert.SerializeObject(args, Formatting.Indented));
-                Console.WriteLine("[Status]: " + router.DoRoute(target, action, args).DumpJson());
+                if (target == "Exec")
+                {
+                    ExecFile(router, action);
+                }
+                else
+                {
+                    dest.WriteLine("[Status]: " + router.DoRoute(target, action, args).DumpJson());
+                }
             }
 
-            Console.WriteLine("End of Stdio Handler.");
+            dest.WriteLine("End of Stdio Handler.");
         }
 
         static private (string, string, object[], int) ParseCmd(string cmd)
@@ -44,7 +52,7 @@ namespace DaemonInterface
             string target, action;
             List<object> args = new List<object>();
 
-            string pat1 = @"\[.*\]|\w+";
+            string pat1 = @"\[.*\]|[^ ]+";
             string pat2 = @"[+-]?[0-9]+([.]?[0-9]+)?";
             MatchCollection m, m2;
 
@@ -91,6 +99,16 @@ namespace DaemonInterface
 
             // Return
             return (target, action, args.ToArray(), 0);
+        }
+
+        static private void ExecFile(Route router, string file_path)
+        {
+            StreamReader src = new StreamReader(file_path);
+            StreamWriter dest = new StreamWriter(file_path + "_out");
+
+            Console.WriteLine("Start Exec File: " + file_path);
+            StartHandle(router, src, dest);
+            Console.WriteLine("End of Exec File: " + file_path);
         }
     }
 }
