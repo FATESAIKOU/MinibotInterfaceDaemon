@@ -11,8 +11,6 @@ namespace DaemonInterface
     {
         static public void StartHandle(Route router, StreamReader src, StreamWriter dest)
         {
-            Console.WriteLine("Start of Stdio Handler.");
-
             int status;
             string cmd;
             string target, action;
@@ -20,31 +18,39 @@ namespace DaemonInterface
 
             while (true)
             {
-                dest.Write("[Command]: ");
-                cmd = src.ReadLine();
+                if (dest != null)
+                    dest.Write("[Command]: ");
 
+                // Get command
+                cmd = src.ReadLine();
                 if (cmd == "Exit")
                     break;
 
+                // Parse command and check
                 (target, action, args, status) = ParseCmd(cmd);
                 if (status != 0)
                 {
                     Console.WriteLine("Invalid command format.");
                     continue;
                 }
-                dest.WriteLine("[GetCommand]: " + target + " " + action + " " + JsonConvert.SerializeObject(args, Formatting.Indented));
 
+                // Check command contain
+                if (dest != null)
+                    dest.WriteLine("[GetCommand]: " + target + " " + action + " " + JsonConvert.SerializeObject(args, Formatting.Indented));
+
+                // Check command type (Macro or Other)
                 if (target == "Exec")
                 {
                     ExecFile(router, action, args);
                 }
                 else
                 {
-                    dest.WriteLine("[Status]: " + router.DoRoute(target, action, args).DumpJson());
+                    string robot_status = router.DoRoute(target, action, args).DumpJson();
+
+                    if (dest != null)
+                        dest.WriteLine("[Status]: " + robot_status);
                 }
             }
-
-            Console.WriteLine("End of Stdio Handler.");
         }
 
         static private (string, string, object[], int) ParseCmd(string cmd)
@@ -107,22 +113,22 @@ namespace DaemonInterface
 
         static private void ExecFile(Route router, string file_path, object[] args)
         {
-            StreamReader src;
-            StreamWriter curr_dest = new System.IO.StreamWriter(Console.OpenStandardOutput());
+            StreamReader src = new StreamReader(file_path);;
 
             int limit = 1;
             if (args.Length > 0) limit = (int)args[0];
 
             for (int i = 0; i < limit; i ++)
             {
-                src = new StreamReader(file_path);
+                Console.WriteLine("[EXEC_FILE][Round-(" + (i+1).ToString() + "/" + limit + ")][" + file_path + "]");
 
-                Console.WriteLine("Start Exec File: " + file_path);
-                StartHandle(router, src, curr_dest);
-                Console.WriteLine("End of Exec File: " + file_path);
-                
-                src.Close();
+                StartHandle(router, src, null);
+                src.BaseStream.Seek(0, SeekOrigin.Begin);
+
+                Console.WriteLine("[EXEC_FILE][Status] " + router.DoRoute("Robot", "GetStatus", null).DoMap().state);
             }
+
+            src.Close();
         }
     }
 }

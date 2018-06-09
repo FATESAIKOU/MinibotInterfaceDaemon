@@ -1,0 +1,6 @@
+Robot Enable
+Robot HomeAll
+Robot Wait 576 100
+Robot AcsPTP [0, 10, 0, 0, 1, 0]
+Robot Wait 576 100
+Exit

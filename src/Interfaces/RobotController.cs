@@ -9,8 +9,8 @@ namespace Controller
     {
         readonly static public Dictionary<string, Func<RobotAgent, object[], RobotStatus>> selector = new Dictionary<string, Func<RobotAgent, object[], RobotStatus>>()
         {
-            { "Enable", Enable }, { "Disable", Disable }, { "Reset", Reset },
-            { "Home", Home }, {"HomeAll", HomeAll},
+            { "Enable", Enable }, { "Disable", Disable }, { "Reset", Reset }, {"GetStatus", GetStatus},
+            { "Home", Home }, {"HomeAll", HomeAll}, {"HomeGripper", HomeGripper},
             { "AcsJog", AcsJog }, { "PcsLine", PcsLine }, { "AcsPTP", AcsPTP }, { "PcsPTP", PcsPTP },
             { "Release", Release }, { "Grip", Grip },
             { "Wait", Wait }, { "WaitGripper", WaitGripper },
@@ -53,6 +53,11 @@ namespace Controller
             robot_agent.Reset();
             return robot_agent.GetStatus();
         }
+
+        static private RobotStatus GetStatus(RobotAgent robot_agent, object args)
+        {
+            return robot_agent.GetStatus();
+        }
         #endregion
         #region Initialize
         static private RobotStatus Home(RobotAgent robot_agent, object[] args)
@@ -61,6 +66,13 @@ namespace Controller
                 throw new System.ArgumentOutOfRangeException("AxisId out of range!!", "AxisId(args[0])");
 
             robot_agent.HomeRobot( (int)args[0] );
+
+            return robot_agent.GetStatus();
+        }
+
+        static private RobotStatus HomeGripper(RobotAgent robot_agent, object[] args)
+        {
+            robot_agent.HomeGripper();
 
             return robot_agent.GetStatus();
         }

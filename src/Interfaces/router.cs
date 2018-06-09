@@ -32,7 +32,7 @@ namespace DaemonCore
                     // CameraController;
                     return null;
                 default:
-                    throw new System.ArgumentException("No Such Target!!", "target");
+                    throw new System.ArgumentException("No Such Target: ", target);
             }
         }
 

@@ -1,0 +1,9 @@
+Robot AcsPTP [0, 10, 0, 0, 1, 0]
+Robot Release
+Robot Wait 576 100
+Robot WaitGripper 100
+Robot AcsPTP [0, 10, 0, 0, 1, -150]
+Robot Grip 40 20
+Robot Wait 576 100
+Robot WaitGripper 100
+Exit
