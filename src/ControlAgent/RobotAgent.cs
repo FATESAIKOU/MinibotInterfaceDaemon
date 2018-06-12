@@ -189,27 +189,36 @@ namespace NEXCOMROBOT
         {
             gripper_ctl.SVON = true;
 
+            DateTime start_time = DateTime.Now;
             do {
-                System.Threading.Thread.Sleep(gripper_check_interval);
-            } while (!gripper_ctl.SVRE);
+                System.Threading.Thread.Sleep(gripper_check_interval);            
+            } while (!gripper_ctl.SVRE &&
+                ((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds < max_timeout
+            );
         }
 
         public void DisableGripper()
         {
             gripper_ctl.SVON = false;
 
+            DateTime start_time = DateTime.Now;
             do {
                 System.Threading.Thread.Sleep(gripper_check_interval);
-            } while (gripper_ctl.SVON);
+            } while (gripper_ctl.SVRE &&
+                ((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds < max_timeout
+            );
         }
 
         public void ResetGripper()
         {
             gripper_ctl.RESET = true;
 
+            DateTime start_time = DateTime.Now;
             do {
                 System.Threading.Thread.Sleep(gripper_check_interval);
-            } while (gripper_ctl.ALARM);
+            } while (gripper_ctl.ALARM &&
+                ((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds < max_timeout
+            );
 
             gripper_ctl.RESET = false;
         }
@@ -400,5 +409,6 @@ namespace NEXCOMROBOT
         };
 
         private int gripper_check_interval = 100;
+        private int max_timeout = 10000;
     }
 }
