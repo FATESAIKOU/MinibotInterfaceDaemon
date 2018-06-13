@@ -266,7 +266,7 @@ namespace NEXCOMROBOT
 
             gripper_ctl.DataFlag = 65535;
             gripper_ctl.MovementMode = 1;
-            gripper_ctl.Positon = gripper_ctl.Current_Position - 5;
+            gripper_ctl.Positon = gripper_ctl.Current_Position - 10;
             gripper_ctl.Speed = 100;
             gripper_ctl.Acc = 100;
             gripper_ctl.Dec = 100;
@@ -293,7 +293,7 @@ namespace NEXCOMROBOT
 
             gripper_ctl.DataFlag = 65535;
             gripper_ctl.MovementMode = 1;
-            gripper_ctl.Positon = 4800;
+            gripper_ctl.Positon = 4700;
             gripper_ctl.Speed = 100;
             gripper_ctl.Acc = 100;
             gripper_ctl.Dec = 100;
@@ -303,7 +303,7 @@ namespace NEXCOMROBOT
             gripper_ctl.Moving_Force = 100;
             gripper_ctl.Area_1 = 0;
             gripper_ctl.Area_2 = 0;
-            gripper_ctl.In_Position = 5000;
+            gripper_ctl.In_Position = 0;
 
             gripper_ctl.StartFlag = true;
             while (!gripper_ctl.BUSY && !gripper_ctl.ALARM)
