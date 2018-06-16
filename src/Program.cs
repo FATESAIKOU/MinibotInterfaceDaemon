@@ -7,23 +7,26 @@ using NEXCOMROBOT.MCAT;
 //namespace work
 namespace NEXCOMROBOT
 {
+    public static class DaemonVars
+    {
+        public static Route router = null;
+    }
     class Program
     {
         static void Main(string[] args)
         {
             Console.WriteLine("Hello, World");
 
-            
-            Route router = new Route();
-            router.Start();
-            //router.Start(NexMotion_Define.DEV_TYPE_ETHERCAT);
+            DaemonVars.router = new Route();
+            DaemonVars.router.Start();
+            //DaemonVars.router.Start(NexMotion_Define.DEV_TYPE_ETHERCAT);
 
             StreamReader curr_src = new System.IO.StreamReader(Console.OpenStandardInput());
             StreamWriter curr_dest = new System.IO.StreamWriter(Console.OpenStandardOutput());
             curr_dest.AutoFlush = true;
-            Stdio.StartHandle(router, curr_src, curr_dest);
+            Stdio.StartHandle(DaemonVars.router, curr_src, curr_dest);
 
-            router.Shudown();
+            DaemonVars.router.Shudown();
 
             Console.WriteLine("Bye, World");
         }
