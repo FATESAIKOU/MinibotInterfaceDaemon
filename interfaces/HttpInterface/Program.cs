@@ -30,6 +30,7 @@ namespace HttpInterface
 
             // Init daemon var
             DaemonVars.router.Start();
+            //DaemonVars.router.Start(NEXCOMROBOT.MCAT.NexMotion_Define.DEV_TYPE_ETHERCAT);
             DaemonVars.stdout_stream.AutoFlush = true;
 
             // Start web
@@ -48,7 +49,7 @@ namespace HttpInterface
             // Shutdown system
             Console.WriteLine("Shutdown system");
             DaemonVars.router.Shudown();
-            
+
             Console.WriteLine("End Web");
         }
 
