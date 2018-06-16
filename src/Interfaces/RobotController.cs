@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using NEXCOMROBOT;
 using NEXCOMROBOT.MCAT;
 
-namespace Controller
+namespace LogicController
 {
     static public class RobotController
     {
