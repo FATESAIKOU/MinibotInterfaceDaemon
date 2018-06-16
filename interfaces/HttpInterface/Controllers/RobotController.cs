@@ -35,8 +35,10 @@ namespace HttpInterface.Controllers
             {
                 string target = (string) command[0];
                 string action = (string) command[1];
-                //object[] args = ((JArray) command[2]).ToObject<object[]>();
-                object[] args = ConvertArgs((JArray)command[2]);
+                object[] args = null;
+
+                if (command.Length > 2 && command[2] != null && command[2].GetType() == typeof(JArray))
+                    args = ConvertArgs((JArray)command[2]);
 
                 DaemonVars.router.DoRoute(target, action, args);
             }
