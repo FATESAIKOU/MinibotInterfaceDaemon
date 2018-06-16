@@ -1,7 +1,7 @@
 using System;
 using NEXCOMROBOT;
 using NEXCOMROBOT.MCAT;
-using Controller;
+using LogicController;
 
 namespace DaemonCore
 {
