@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using DaemonCore;
 using DaemonInterface;
 using NEXCOMROBOT.MCAT;
@@ -27,13 +28,41 @@ namespace NEXCOMROBOT
             // Init stdin/stdout
             DaemonVars.stdout_stream.AutoFlush = true;
 
-            // Stdio handler
-            Stdio.StartHandle(DaemonVars.router, DaemonVars.stdin_stream, DaemonVars.stdout_stream);
+            // Daemon handler
+            DaemonHandler();
 
             // Shutdown router
             DaemonVars.router.Shudown();
 
             Console.WriteLine("Bye, World");
+        }
+
+        static void DaemonHandler()
+        {
+            StreamReader src = DaemonVars.stdin_stream;
+            StreamWriter dest = DaemonVars.stdout_stream;
+            string command;
+
+            while (true)
+            {
+                dest.Write("[Daemon-cmd]: ");
+                command = src.ReadLine();
+                switch (command)
+                {
+                    case "StdioStart":
+                        Stdio.StartHandle(DaemonVars.router, DaemonVars.stdin_stream, DaemonVars.stdout_stream);
+                        break;
+                    case "WebStart":
+                        break;
+                    case "WebShutdown":
+                        break;
+                    case "Shutdown":
+                        return;
+                    default:
+                        Console.WriteLine("[Daemon-ret]: invalid command format.");
+                        break;
+                }
+            }
         }
     }
 }
