@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using DaemonCore;
 using NEXCOMROBOT;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace HttpInterface.Controllers
 {
@@ -34,7 +35,8 @@ namespace HttpInterface.Controllers
             {
                 string target = (string) command[0];
                 string action = (string) command[1];
-                object[] args = (object[]) command[2];
+                //object[] args = ((JArray) command[2]).ToObject<object[]>();
+                object[] args = ConvertArgs((JArray)command[2]);
 
                 DaemonVars.router.DoRoute(target, action, args);
             }
@@ -45,6 +47,38 @@ namespace HttpInterface.Controllers
             }
             
             return DaemonVars.router.DoRoute("Robot", "GetStatus", null).DoMap();
+        }
+
+        private object[] ConvertArgs(JArray raw_args)
+        {
+            object[] args = new object[raw_args.Count];
+
+            for (int i = 0; i < raw_args.Count; i ++)
+            {
+                var item = raw_args[i];
+
+                if (item.GetType() == typeof(JArray))
+                {
+                    double[] pos = new double[6];
+                    for (int j = 0; j < 6; j ++)
+                        pos[j] = Convert.ToDouble((string) item[j]);
+                    
+                    args[i] = pos;
+                }
+                else
+                {
+                    try
+                    {
+                        args[i] = Convert.ToInt32((string) item);
+                    }
+                    catch (FormatException)
+                    {
+                        args[i] = (string) item;
+                    }
+                }
+            }
+
+            return args;
         }
     }
 }
