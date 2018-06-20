@@ -215,7 +215,7 @@ namespace NEXCOMROBOT
                 duration = (int)((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds;
             } while (!gripper_ctl.SVRE && duration < max_timeout);
 
-            return duration < max_timeout ? 0 : 1;
+            return duration < max_timeout ? 0:1;
         }
 
         public int DisableGripper()
@@ -229,7 +229,7 @@ namespace NEXCOMROBOT
                 duration = (int)((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds;
             } while (gripper_ctl.SVRE && duration < max_timeout);
 
-            return duration < max_timeout ? 0 : 1;
+            return duration < max_timeout ? 0:1;
         }
 
         public int ResetGripper()
@@ -245,7 +245,7 @@ namespace NEXCOMROBOT
 
             gripper_ctl.RESET = false;
 
-            return duration < max_timeout ? 0 : 1;
+            return duration < max_timeout ? 0:1;
         }
         #endregion
 
@@ -410,7 +410,7 @@ namespace NEXCOMROBOT
                 duration = (int)((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds;
             } while( status != aim_status && duration < timeout );
 
-            return duration < timeout ? 0 : 1;
+            return duration < timeout ? 0:1;
         }
 
         public int WaitGripperBusy(int interval = 100, int timeout = int.MaxValue)
