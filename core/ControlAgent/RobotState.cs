@@ -57,7 +57,7 @@ namespace NEXCOMROBOT
         public double[] acs;
         public double[] pcs;
         public GripperStatus gripper_status;
-        public int[] ret_codes;
+        public int ret_codes;
 
         public string DumpJson()
         {
