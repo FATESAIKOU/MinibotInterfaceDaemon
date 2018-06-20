@@ -56,7 +56,7 @@ namespace NEXCOMROBOT
         #region StateGetting
         public RobotStatus GetStatus()
         {
-            SysParamUpdate();
+            int ret = SysParamUpdate();
 
             var group_parameters = group_ctrl.GroupParameters;
             RobotStatus robot_status = new RobotStatus();
@@ -65,6 +65,7 @@ namespace NEXCOMROBOT
             robot_status.acs = group_parameters.ActAcs;
             robot_status.pcs = group_parameters.ActPcs;
             robot_status.gripper_status = GetGripperStatus();
+            robot_status.ret_code = ret;
 
             return robot_status;
         }

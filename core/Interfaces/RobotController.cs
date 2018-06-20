@@ -38,20 +38,29 @@ namespace LogicController
         #region StateControl
         static private RobotStatus Enable(RobotAgent robot_agent, object[] args)
         {
-            robot_agent.Enable();
-            return robot_agent.GetStatus();
+            int ret = robot_agent.Enable();
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
+
+            return robot_status;
         }
 
         static private RobotStatus Disable(RobotAgent robot_agent, object[] args)
         {
-            robot_agent.Disable();
-            return robot_agent.GetStatus();
+            int ret = robot_agent.Disable();
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
+
+            return robot_status;
         }
 
         static private RobotStatus Reset(RobotAgent robot_agent, object[] args)
         {
-            robot_agent.Reset();
-            return robot_agent.GetStatus();
+            int ret = robot_agent.Reset();
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
+
+            return robot_status;
         }
 
         static private RobotStatus GetStatus(RobotAgent robot_agent, object args)
