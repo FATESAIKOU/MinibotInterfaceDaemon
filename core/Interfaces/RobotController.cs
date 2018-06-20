@@ -177,14 +177,20 @@ namespace LogicController
         #region Wait
         static private RobotStatus Wait(RobotAgent robot_agent, object[] args)
         {
-            robot_agent.WaitStatus((int)args[0], (int)args[1], WAIT_TIMEOUT);
-            return robot_agent.GetStatus();
+            int ret = robot_agent.WaitStatus((int)args[0], (int)args[1], WAIT_TIMEOUT);
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
+
+            return robot_status;
         }
 
         static private RobotStatus WaitGripper(RobotAgent robot_agent, object[] args)
         {
-            robot_agent.WaitGripperBusy((int)args[0], WAIT_TIMEOUT);
-            return robot_agent.GetStatus();
+            int ret = robot_agent.WaitGripperBusy((int)args[0], WAIT_TIMEOUT);
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
+
+            return robot_status;
         }
         #endregion
         #region System
