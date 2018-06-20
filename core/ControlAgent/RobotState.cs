@@ -79,6 +79,7 @@ namespace NEXCOMROBOT
             robot_status_readable.status = tmp_status.ToArray();
             robot_status_readable.acs = this.acs;
             robot_status_readable.pcs = this.pcs;
+            robot_status_readable.ret_code = this.ret_code;
             
             if (this.gripper_status != null)
                 robot_status_readable.gripper_status_readable = this.gripper_status.DoMap();
@@ -93,6 +94,7 @@ namespace NEXCOMROBOT
         public string[] status;
         public double[] acs;
         public double[] pcs;
+        public int ret_code;
         public GripperStatusReadable gripper_status_readable;
     }
 
