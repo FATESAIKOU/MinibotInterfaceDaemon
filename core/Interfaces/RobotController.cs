@@ -158,15 +158,20 @@ namespace LogicController
         #region GripperMove
         static private RobotStatus Release(RobotAgent robot_agent, object[] args)
         {
-            robot_agent.ReleaseGripper();
-            return robot_agent.GetStatus();
+            int ret = robot_agent.ReleaseGripper();
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
+
+            return robot_status;
         }
 
         static private RobotStatus Grip(RobotAgent robot_agent, object[] args)
         {
-            robot_agent.MoveGripper(Convert.ToUInt16(args[0]), Convert.ToUInt16(args[1]));
+            int ret = robot_agent.MoveGripper(Convert.ToUInt16(args[0]), Convert.ToUInt16(args[1]));
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
 
-            return robot_agent.GetStatus();
+            return robot_status;
         }
         #endregion
         #region Wait
