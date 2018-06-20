@@ -1,4 +1,4 @@
-Exec ../scripts/init.txt
+Exec ../../scripts/init.txt
 Robot GetStatus
-Exec ../scripts/grip_script.txt 2
+Exec ../../scripts/grip_script.txt 2
 Exit
