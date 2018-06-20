@@ -74,23 +74,30 @@ namespace LogicController
             if ( (int)args[0] < 0 || 5 < (int)args[0] )
                 throw new System.ArgumentOutOfRangeException("AxisId out of range!!", "AxisId(args[0])");
 
-            robot_agent.HomeRobot( (int)args[0] );
+            int ret = robot_agent.HomeRobot( (int)args[0] );
 
-            return robot_agent.GetStatus();
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
+
+            return robot_status;
         }
 
         static private RobotStatus HomeGripper(RobotAgent robot_agent, object[] args)
         {
-            robot_agent.HomeGripper();
+            int ret = robot_agent.HomeGripper();
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
 
-            return robot_agent.GetStatus();
+            return robot_status;
         }
 
         static private RobotStatus HomeAll(RobotAgent robot_agent, object[] args)
         {
-            robot_agent.HomeAll();
+            int ret = robot_agent.HomeAll();
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
 
-            return robot_agent.GetStatus();
+            return robot_status;
         }
         #endregion
         #region RobotMove
