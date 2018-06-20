@@ -20,24 +20,35 @@ namespace NEXCOMROBOT
 
         /* State Setting */
         #region StateSetting
-        public void Enable()
+        public int Enable()
         {
-            group_ctrl.GroupAdapter.NMC_GroupEnable();
+            int ret = group_ctrl.GroupAdapter.NMC_GroupEnable();
             EnableGripper();
+
+            return ret;
         }
 
-        public void Disable()
+        public int Disable()
         {
-            group_ctrl.GroupAdapter.NMC_GroupDisable();
+            int ret = group_ctrl.GroupAdapter.NMC_GroupDisable();
             DisableGripper();
+
+            return ret;
         }
 
-        public void Reset()
+        public int Reset()
         {
-            group_ctrl.GroupAdapter.NMC_GroupDisable();
-            group_ctrl.GroupAdapter.NMC_GroupResetState();
+            int ret;
+            ret = group_ctrl.GroupAdapter.NMC_GroupDisable();
+            if ( ret != NexMotion_ErrCode.NMCERR_SUCCESS ) return ret;
+
+            ret = group_ctrl.GroupAdapter.NMC_GroupResetState();
+            if ( ret != NexMotion_ErrCode.NMCERR_SUCCESS ) return ret;
+
             DisableGripper();
             ResetGripper();
+
+            return ret;
         }
         #endregion
         
@@ -91,27 +102,34 @@ namespace NEXCOMROBOT
 
         /* Robot Param Setting */
         #region RobotParamSetting
-        public void SetHomePos(Pos_T home_pos)
+        public int SetHomePos(Pos_T home_pos)
         {
             int mask = 1 << group_ctrl.AxisCount - 1;
 
-            group_ctrl.GroupAdapter.NMC_GroupSetHomePos(mask, ref home_pos);
+            int ret = group_ctrl.GroupAdapter.NMC_GroupSetHomePos(mask, ref home_pos);
             SysParamUpdate();
+
+            return ret;
         }
 
-        public void SetVelocity(double[] vel)
+        public int SetVelocity(double[] vel)
         {
             int param_num = 0x32;
             int sub_index = 0;
+            int ret = 0;
 
             for (int axis_index = 0; axis_index < group_ctrl.AxisCount; ++ axis_index)
             {
-                group_ctrl.GroupAdapter.NMC_GroupAxSetParamF64(
+                ret = group_ctrl.GroupAdapter.NMC_GroupAxSetParamF64(
                     axis_index, param_num, sub_index,
                     vel[axis_index]
                 );
+
+                if ( ret != NexMotion_ErrCode.NMCERR_SUCCESS ) break;
             }
             SysParamUpdate();
+
+            return ret;
         }
         #endregion
         
@@ -128,7 +146,7 @@ namespace NEXCOMROBOT
                 HomingOpcodes[Math.Min(axis_index, 6)]
             );
 
-            if (ret != NexMotion_ErrCode.NMCERR_SUCCESS) return ret;
+            if ( ret != NexMotion_ErrCode.NMCERR_SUCCESS ) return ret;
 
             ret = group_ctrl.GroupAdapter.NMC_GroupAxesHomeDrive(1 << axis_index);
 
@@ -143,7 +161,7 @@ namespace NEXCOMROBOT
 
             int ret;
             ret = group_ctrl.GroupAdapter.NMC_GroupJogAcs(axis_index, direction, ref max_vel);
-            if (ret != NexMotion_ErrCode.NMCERR_SUCCESS) return ret;
+            if ( ret != NexMotion_ErrCode.NMCERR_SUCCESS ) return ret;
 
             System.Threading.Thread.Sleep(interval);
             ret = group_ctrl.GroupAdapter.NMC_GroupHalt();
@@ -185,42 +203,48 @@ namespace NEXCOMROBOT
 
         /* Gripper State Setting */
         #region GripperStateSetting
-        public void EnableGripper()
+        public int EnableGripper()
         {
+            int duration;
             gripper_ctl.SVON = true;
 
             DateTime start_time = DateTime.Now;
             do {
-                System.Threading.Thread.Sleep(gripper_check_interval);            
-            } while (!gripper_ctl.SVRE &&
-                ((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds < max_timeout
-            );
+                System.Threading.Thread.Sleep(gripper_check_interval);
+                duration = (int)((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds;
+            } while (!gripper_ctl.SVRE && duration < max_timeout);
+
+            return duration < max_timeout ? 0 : 1;
         }
 
-        public void DisableGripper()
+        public int DisableGripper()
         {
+            int duration;
             gripper_ctl.SVON = false;
 
             DateTime start_time = DateTime.Now;
             do {
                 System.Threading.Thread.Sleep(gripper_check_interval);
-            } while (gripper_ctl.SVRE &&
-                ((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds < max_timeout
-            );
+                duration = (int)((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds;
+            } while (gripper_ctl.SVRE && duration < max_timeout);
+
+            return duration < max_timeout ? 0 : 1;
         }
 
-        public void ResetGripper()
+        public int ResetGripper()
         {
+            int duration;
             gripper_ctl.RESET = true;
 
             DateTime start_time = DateTime.Now;
             do {
                 System.Threading.Thread.Sleep(gripper_check_interval);
-            } while (gripper_ctl.ALARM &&
-                ((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds < max_timeout
-            );
+                duration = (int)((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds;
+            } while (gripper_ctl.ALARM && duration < max_timeout);
 
             gripper_ctl.RESET = false;
+
+            return duration < max_timeout ? 0 : 1;
         }
         #endregion
 
@@ -312,7 +336,6 @@ namespace NEXCOMROBOT
 
             return gripper_ctl.ALARM ? 1:0;
         }
-
         #endregion
 
         /* Other Utils */
@@ -361,10 +384,11 @@ namespace NEXCOMROBOT
             }
         }
 
-        public void WaitStatus(int aim_status, int interval, int timeout = int.MaxValue)
+        public int WaitStatus(int aim_status, int interval, int timeout = int.MaxValue)
         {            
             int status = 0;
             int state = 0;
+            int duration;
 
             DateTime start_time = DateTime.Now;
             do {
@@ -381,9 +405,11 @@ namespace NEXCOMROBOT
                     this.EMGStop();
                     throw new System.ArgumentException("State Stopped!", "STATE");
                 }
-            } while( status != aim_status && 
-                ((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds < timeout
-            );
+
+                duration = (int)((TimeSpan)(DateTime.Now - start_time)).TotalMilliseconds;
+            } while( status != aim_status && duration < timeout );
+
+            return duration < timeout ? 0 : 1;
         }
 
         public int WaitGripperBusy(int interval = 100, int timeout = int.MaxValue)
