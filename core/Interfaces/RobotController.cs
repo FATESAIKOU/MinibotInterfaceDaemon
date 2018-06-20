@@ -199,9 +199,11 @@ namespace LogicController
             Pos_T target = new Pos_T();
             target.pos = (double[])args[0];
             
-            robot_agent.SetHomePos(target);
+            int ret = robot_agent.SetHomePos(target);
+            RobotStatus robot_status = robot_agent.GetStatus();            
+            robot_status.ret_code = ret;
 
-            return robot_agent.GetStatus();            
+            return robot_status;
         }
         #endregion
     }
