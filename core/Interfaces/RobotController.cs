@@ -102,7 +102,7 @@ namespace LogicController
         #endregion
         #region RobotMove
         static private RobotStatus AcsJog(RobotAgent robot_agent, object[] args)
-        {            
+        {
             if ( (int)args[0] < 0 || 5 < (int)args[0] )
                 throw new System.ArgumentOutOfRangeException("AxisId out of range!!", "AxisId(args[0])");
 
@@ -112,9 +112,11 @@ namespace LogicController
             if ( (int)args[2] < 0 || 2000 < (int)args[2] )
                 throw new System.ArgumentOutOfRangeException("Interval out of range!!", "Interval(args[2])");
 
-            robot_agent.AcsJog((int)args[0], (int)args[1], (int)args[2], MAX_VEL);
+            int ret = robot_agent.AcsJog((int)args[0], (int)args[1], (int)args[2], MAX_VEL);
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
 
-            return robot_agent.GetStatus();
+            return robot_status;
         }
 
         static private RobotStatus PcsLine(RobotAgent robot_agent, object[] args)
@@ -122,9 +124,11 @@ namespace LogicController
             Pos_T dest = new Pos_T();
             dest.pos = (double[])args[0];
             
-            robot_agent.PcsLine(dest, MAX_VEL);
+            int ret = robot_agent.PcsLine(dest, MAX_VEL);
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
 
-            return robot_agent.GetStatus();
+            return robot_status;
         }
 
         static private RobotStatus AcsPTP(RobotAgent robot_agent, object[] args)
@@ -132,9 +136,11 @@ namespace LogicController
             Pos_T dest = new Pos_T();
             dest.pos = (double[])args[0];
             
-            robot_agent.AcsPTP(dest);
+            int ret = robot_agent.AcsPTP(dest);
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
 
-            return robot_agent.GetStatus();
+            return robot_status;
         }
 
         static private RobotStatus PcsPTP(RobotAgent robot_agent, object[] args)
@@ -142,9 +148,11 @@ namespace LogicController
             Pos_T dest = new Pos_T();
             dest.pos = (double[])args[0];
             
-            robot_agent.PcsPTP(dest);
+            int ret = robot_agent.PcsPTP(dest);
+            RobotStatus robot_status = robot_agent.GetStatus();
+            robot_status.ret_code = ret;
 
-            return robot_agent.GetStatus();
+            return robot_status;
         }
         #endregion
         #region GripperMove
