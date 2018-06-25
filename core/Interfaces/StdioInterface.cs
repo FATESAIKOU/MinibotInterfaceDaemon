@@ -125,7 +125,7 @@ namespace DaemonInterface
                 StartHandle(router, src, null);
                 src.BaseStream.Seek(0, SeekOrigin.Begin);
 
-                Console.WriteLine("[EXEC_FILE][Status] " + router.DoRoute("Robot", "GetStatus", null).DoMap().state);
+                Console.WriteLine("[EXEC_FILE][Status] " + ((NEXCOMROBOT.RobotStatus)router.DoRoute("Robot", "GetStatus", null)).DoMap().state);
             }
 
             src.Close();

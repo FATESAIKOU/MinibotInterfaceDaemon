@@ -4,6 +4,20 @@ using Newtonsoft.Json;
 
 namespace NEXCOMROBOT
 {
+    public class ResponseStatus
+    {
+        public virtual string DumpJson()
+        {
+            return "";
+        }
+
+    }
+
+    public class ResponseStatusReadable
+    {
+        //
+    }
+
     static public class StateMaps
     {
         readonly static public string[] RobotStateMap = new string[] {
@@ -50,7 +64,7 @@ namespace NEXCOMROBOT
         }
 
     }
-    public class RobotStatus
+    public class RobotStatus : ResponseStatus
     {
         public int state;
         public int status;
@@ -59,7 +73,7 @@ namespace NEXCOMROBOT
         public GripperStatus gripper_status;
         public int ret_code;
 
-        public string DumpJson()
+        public override string DumpJson()
         {
             return JsonConvert.SerializeObject(this.DoMap(), Formatting.Indented);
         }
@@ -88,7 +102,7 @@ namespace NEXCOMROBOT
         }
     }
 
-    public class RobotStatusReadable
+    public class RobotStatusReadable : ResponseStatusReadable
     {
         public string state;
         public string[] status;
@@ -98,7 +112,7 @@ namespace NEXCOMROBOT
         public GripperStatusReadable gripper_status_readable;
     }
 
-    public class GripperStatus
+    public class GripperStatus : ResponseStatus
     {
         public bool is_ready;
         public bool is_busy;
@@ -106,7 +120,7 @@ namespace NEXCOMROBOT
         public double current_pos;
         public int alarm_code;
 
-        public string DumpJson()
+        public override string DumpJson()
         {
             return JsonConvert.SerializeObject(this.DoMap(), Formatting.Indented);
         }
@@ -124,7 +138,7 @@ namespace NEXCOMROBOT
         }
     }
 
-    public class GripperStatusReadable
+    public class GripperStatusReadable : ResponseStatusReadable
     {
         public bool is_ready;
         public bool is_busy;

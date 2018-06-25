@@ -21,7 +21,7 @@ namespace DaemonCore
             ether_cat_net.InitIOForRobot(2, 0);
         }
         
-        public RobotStatus DoRoute(string target, string action, object[] args)
+        public ResponseStatus DoRoute(string target, string action, object[] args)
         {
             switch (target)
             {
