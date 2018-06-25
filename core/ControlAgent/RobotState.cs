@@ -18,6 +18,8 @@ namespace NEXCOMROBOT
         //
     }
 
+
+    // Robot
     static public class StateMaps
     {
         readonly static public string[] RobotStateMap = new string[] {
@@ -145,5 +147,29 @@ namespace NEXCOMROBOT
         public bool is_gripped;
         public double current_pos;
         public int alarm_code; // TODO: Make it readable.    
+    }
+
+    // Camera
+    public class CameraStatus : ResponseStatus
+    {
+        public byte[] image;
+
+        public override string DumpJson()
+        {
+            return JsonConvert.SerializeObject(this.DoMap(), Formatting.Indented);
+        }
+        
+        public CameraStatusReadable DoMap()
+        {
+            CameraStatusReadable csr = new CameraStatusReadable();
+            csr.image_b64 = Convert.ToBase64String(this.image);
+
+            return csr;
+        }
+    }
+
+    public class CameraStatusReadable : ResponseStatusReadable
+    {
+        public string image_b64;
     }
 }
