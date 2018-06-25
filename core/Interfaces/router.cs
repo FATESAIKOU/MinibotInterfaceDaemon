@@ -29,8 +29,8 @@ namespace DaemonCore
                     RobotAgent robot_agent = ether_cat_net.GetRobotAgent(0);
                     return RobotController.Do(robot_agent, action, args);
                 case "Camera":
-                    // CameraController;
-                    return null;
+                    // EzCameraController;
+                    return EzCameraController.Do(action, null);
                 default:
                     throw new System.ArgumentException("No Such Target: ", target);
             }
