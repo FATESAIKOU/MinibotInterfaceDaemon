@@ -19,7 +19,7 @@ namespace HttpInterface.Controllers
         {
             if (id == 0)
             {
-                return DaemonVars.router.DoRoute("Robot", "GetStatus", null).DoMap();    
+                return ((RobotStatus)DaemonVars.router.DoRoute("Robot", "GetStatus", null)).DoMap();    
             }
             else
             {
@@ -48,7 +48,7 @@ namespace HttpInterface.Controllers
                 Console.WriteLine($"[HttpInterface]: bad command({raw_command}), error({e.Message})");
             }
             
-            return DaemonVars.router.DoRoute("Robot", "GetStatus", null).DoMap();
+            return ((RobotStatus)DaemonVars.router.DoRoute("Robot", "GetStatus", null)).DoMap();
         }
 
         private object[] ConvertArgs(JArray raw_args)
