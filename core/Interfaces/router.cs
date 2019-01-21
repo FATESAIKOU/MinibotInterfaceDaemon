@@ -30,7 +30,7 @@ namespace DaemonCore
                     return RobotController.Do(robot_agent, action, args);
                 case "Camera":
                     // EzCameraController;
-                    return EzCameraController.Do(action, null);
+                    return EzCameraController.Do(action, args);
                 default:
                     throw new System.ArgumentException("No Such Target: ", target);
             }

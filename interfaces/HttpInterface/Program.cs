@@ -29,8 +29,8 @@ namespace HttpInterface
             Console.WriteLine("Start Daemon");
 
             // Init daemon var
-            DaemonVars.router.Start();
-            //DaemonVars.router.Start(NEXCOMROBOT.MCAT.NexMotion_Define.DEV_TYPE_ETHERCAT);
+            //DaemonVars.router.Start();
+            DaemonVars.router.Start(NEXCOMROBOT.MCAT.NexMotion_Define.DEV_TYPE_ETHERCAT);
             DaemonVars.stdout_stream.AutoFlush = true;
 
             // Start web
@@ -57,6 +57,7 @@ namespace HttpInterface
         {
             IWebHost web_instance = WebHost.CreateDefaultBuilder(null)
                 .UseStartup<Startup>()
+		.UseUrls("http://*:5000")
                 .Build();
             web_instance.Run();                
         }

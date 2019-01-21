@@ -13,11 +13,14 @@ namespace HttpInterface.Controllers
     [Route("api/[controller]")]
     public class CameraController : Controller
     {
-        // GET api
-        [HttpGet]
-        public CameraStatusReadable Get()
+        // GET api/values
+        [HttpGet("{id}")]
+        public CameraStatusReadable Get(int id)
         {
-            return ((CameraStatus)DaemonVars.router.DoRoute("Camera", "Capture", null)).DoMap();    
+            object[] args = new object[1];
+
+            args[0] = id;
+            return ((CameraStatus)DaemonVars.router.DoRoute("Camera", "Capture", args)).DoMap();    
         }
     }
 }

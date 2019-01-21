@@ -14,7 +14,8 @@ namespace LogicController
             if (action == "Capture")
             {
                 CameraStatus cs = new CameraStatus();
-                cs.image = Capture(@"C:\Users\fatesaikou\work\MinibotInterfaceDaemon\tmp.png");
+                int camera_id = (int)args[0];
+                cs.image = Capture(camera_id, @"C:\Users\miniBot\Desktop\MinibotInterfaceDaemon\tmp.jpeg");
                 return cs;
             }
             else
@@ -23,17 +24,17 @@ namespace LogicController
             }
         }
 
-        static private byte[] Capture(string full_file_name)
+        static private byte[] Capture(int camera_id,string full_file_name)
         {
-            RunCmd(@"C:\Users\fatesaikou\work\MinibotInterfaceDaemon\camera_scripts\capture.py", full_file_name);
+            RunCmd(@"C:\Users\miniBot\Desktop\MinibotInterfaceDaemon\camera_scripts\capture.py", camera_id, full_file_name);
             return System.IO.File.ReadAllBytes(full_file_name);
         }
 
-        static private void RunCmd(string cmd, string args)
+        static private void RunCmd(string cmd, int camera_id, string full_file_name)
         {
             ProcessStartInfo start = new ProcessStartInfo();
-            start.FileName = @"C:\Users\fatesaikou\AppData\Local\Programs\Python\Python36-32/python.exe";
-            start.Arguments = string.Format("{0} {1}", cmd, args);
+            start.FileName = @"C:\Users\minibot\AppData\Local\Programs\Python\Python36-32/python.exe";
+            start.Arguments = string.Format("{0} {1} {2}", cmd, camera_id, full_file_name);
             start.UseShellExecute = false;
             start.RedirectStandardOutput = true;
             using(Process process = Process.Start(start))
